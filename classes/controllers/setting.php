@@ -194,10 +194,15 @@ class RanksSettingController extends RanksController {
 
 		delete_post_meta_by_key($key);
 
+		add_filter('posts_where', array($this, 'target_score_where'), 10, 2);
+
+		$unit = array_shift(array_keys($patterns[$key]['term']));
+		$n = $patterns[$key]['term'][$unit];
 		query_posts(array(
 			'post_type' => $patterns[$key]['post_type'],
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
+			'post_ago' => date_i18n('Y-m-d 00:00:00', strtotime("$n $unit ago")),
 		));
 
 		while(have_posts()){
@@ -212,6 +217,14 @@ class RanksSettingController extends RanksController {
 
 		wp_redirect($this->url('index'));
 		exit;
+	}
+
+	public function target_score_where($where, $wp_query) {
+		global $wpdb;
+		if (!isset($wp_query->query_vars['post_ago'])) return $where;
+		$where.= $wpdb->prepare(" AND {$wpdb->posts}.post_date >= %s", $wp_query->query_vars['post_ago']);
+		var_dump($where);
+		return $where;
 	}
 
 	public function account_analytics() {
