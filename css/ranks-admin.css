@@ -131,17 +131,22 @@ input.ranks-remove-button:hover {
 	display: inline-block;
 	padding: 2px 5px;
 	border: 1px solid #DEDEDE;
+	border-radius: 4px;
 	box-shadow: 0 0 2px #EFEFEF;
 	color: #666666;
 	text-align: center;
 	text-shadow: 0 1px 0 #FFFFFF;
 	text-decoration: none;
 	background: #EFEFEF;
+	background: -moz-linear-gradient(top, #F5F5F5, #E9E9E9);
+	background: -webkit-gradient(linear, left top, left bottom, from(#F5F5F5), to(#E9E9E9));
 }
 .ranks-action-button:hover {
 	border: 1px solid #C0C0C0;
 	color: #777777;
 	background: #F5F5F5;
+	background: -moz-linear-gradient(top, #F9F9F9, #E9E9E9);
+	background: -webkit-gradient(linear, left top, left bottom, from(#F9F9F9), to(#E9E9E9));
 }
 .ranks-action-button:active {
 	color: #555555;

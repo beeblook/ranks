@@ -27,7 +27,7 @@
 					<dd><?php
 						$unit = array_shift(array_keys($pattern['term']));
 						$n = $pattern['term'][$unit];
-						echo sprintf($terms[$unit], $n) . ' <span>' . date('Y/n/j', strtotime("- $n $unit")) . ' - ' . date('Y/n/j') . '</span>';
+						echo sprintf($terms[$unit], $n) . ' <span>' . date('Y/n/j', strtotime("$n $unit ago")) . ' - ' . date('Y/n/j') . '</span>';
 					?></dd>
 					<dt>レート</dt>
 					<dd><?php
@@ -71,6 +71,14 @@
 						<?php echo $account['profile_name'] ? $account['profile_name'] : '未設定'; ?>
 						<span><?php echo $account['profile_id'] ? $account['profile_id'] : ''; ?></span>
 					</dd>
+<?php endif; ?>
+<?php if (isset($account['term'])) : ?>
+					<dt>データ取得期間</dt>
+					<dd><?php
+						$unit = array_shift(array_keys($account['term']));
+						$n = $account['term'][$unit];
+						echo sprintf($terms[$unit], $n) . ' <span>' . date('Y/n/j', strtotime("$n $unit ago")) . ' - ' . date('Y/n/j') . '</span>';
+					?></dd>
 <?php endif; ?>
 				</dl>
 				<div class="ranks-action">

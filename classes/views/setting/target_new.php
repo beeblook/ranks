@@ -7,7 +7,7 @@
 	<a href="<?php echo $this->url('index'); ?>">←戻る</a>
 </p>
 
-<h3>集計パターン 設定</h3>
+<h3>集計パターン 新規設定登録</h3>
 
 <form action="" method="post">
 
@@ -20,10 +20,10 @@
 				任意の名称を設定してください。
 			</th>
 			<td>
-				<input class="regular-text" type="text" name="label" value="<?php echo esc_attr($pattern['label']); ?>" /><br>
-				<input class="regular-text" type="text" name="key" value="<?php echo $key; ?>" />
-				<span class="description">キーは変更できません。</span><br>
-				<span class="description">ランキングは <code>query_posts('meta_key=キー&amp;orderby=meta_value_num&amp;order=desc');</code> で取得可能になります。</span>
+				<input class="regular-text" type="text" name="label" placeholder="名称" value="<?php echo esc_attr($pattern['label']); ?>" /><br>
+				<input class="regular-text" type="text" name="key" placeholder="キー" value="<?php echo $key; ?>" />
+				<span class="description">キーは半角英数字で入力してください。</span><br>
+				<span class="description">ランキングは <code>query_posts('meta_key=[キー]&amp;orderby=meta_value_num&amp;order=desc');</code> で取得可能になります。</span>
 			</td>
 		</tr>
 		<tr>
@@ -68,7 +68,7 @@
 		</tr>
 	</table>
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="保存" />
+		<input class="button-primary" type="submit" name="submit" value="設定を登録" />
 	</p>
 
 </form>

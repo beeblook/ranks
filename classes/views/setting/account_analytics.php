@@ -25,12 +25,16 @@
 			<td><span class="ranks-saved-value"><?php echo $accounts['analytics']['profile_name']; ?></span></td>
 		</tr>
 		<tr>
-			<th><strong>取得期間</strong></th>
+			<th><strong>プロファイルID</strong></th>
+			<td><span class="ranks-saved-value"><?php echo $accounts['analytics']['profile_id']; ?></span></td>
+		</tr>
+		<tr>
+			<th><strong>データ取得期間</strong></th>
 			<td>
-				<input type="text" name="term[n]" value="<?php echo esc_attr(array_shift(array_values($pattern['term']))); ?>" size="2" />
+				<input type="text" name="term[n]" value="<?php echo esc_attr(array_shift(array_values($accounts['analytics']['term']))); ?>" size="2" />
 				<select name="term[unit]">
 <?php foreach ($terms as $term => $term_format) : ?>
-					<option value="<?php echo esc_attr($term); ?>" <?php selected(isset($pattern['term'][$term])); ?> /> <?php echo sprintf($term_format, ''); ?></option>
+					<option value="<?php echo esc_attr($term); ?>" <?php selected(isset($accounts['analytics']['term'][$term])); ?> /> <?php echo sprintf($term_format, ''); ?></option>
 <?php endforeach; ?>
 				</select>
 			</td>

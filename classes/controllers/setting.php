@@ -17,6 +17,9 @@ class RanksSettingController extends RanksController {
 			'auth_token' => null,
 			'profile_id' => null,
 			'profile_name' => null,
+			'term' => array('month'=>1),
+			'start_date' => null,
+			'end_date' => null,
 		),
 		'facebook' => array(
 			'label' => 'Facebook',
@@ -260,6 +263,7 @@ class RanksSettingController extends RanksController {
 			} else {
 
 				$accounts['analytics']['status'] = isset($_POST['enable']) && $_POST['enable'];
+				$accounts['analytics']['term'] = array($_POST['term']['unit']=>$_POST['term']['n']);
 				update_option('ranks_accounts', $accounts);
 				$message = 3;
 
@@ -448,7 +452,13 @@ class RanksSettingController extends RanksController {
 			$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
 			if (!isset($accounts['analytics']['auth_token'])) return 0;
 			$ga = new gapi(null, null, $accounts['analytics']['auth_token']);
-			$ga->requestReportData($accounts['analytics']['profile_id'], 'pagePath', 'pageviews', '-pageviews', null, date('Y-m-d',strtotime('1 year ago')), date('Y-m-d'), 1, 1000);
+			$unit = array_shift(array_keys($accounts['analytics']['term']));
+			$n = $accounts['analytics']['term'][$unit];
+			$start_date = date('Y-m-d', strtotime("$n $unit ago"));
+			$end_date = date('Y-m-d');
+			$start_index = 1;
+			$max_resluts = 1000;
+			$ga->requestReportData($accounts['analytics']['profile_id'], 'pagePath', 'pageviews', '-pageviews', null, $start_date, $end_date, $start_index, $max_resluts);
 			foreach($ga->getResults() as $result) {
 				$report[(string) $result] = $result->getPageviews();
 			}
