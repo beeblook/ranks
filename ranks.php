@@ -2,13 +2,13 @@
 /*
 Plugin Name: Ranks
 Plugin URI: http://
-Description: ｼｬﾊﾞﾄﾞｩﾋﾞﾀｯﾁﾗﾝｷｰﾝｸﾞ!! ﾌﾟﾗｸﾞｲﾝ ﾌﾟﾘｰｽﾞ!! ﾋｨ! ﾋｨ! ﾋｨﾋｨﾋｨｰ!! さぁショータイムだ！
+Description: Analytics・Facebook・Twitterからランキングを作ります。
 Author: colorchips
 Author URI: http://www.colorchips.co.jp/
-Version: 0.1
+Version: 1.0
 */
 
-define('RANKS_VER', '0.1');
+define('RANKS_VER', '1.0');
 define('RANKS_DIR', dirname(__FILE__));
 
 $ranks = new Ranks();
