@@ -14,9 +14,9 @@
 			<div class="ranks-box">
 				<div class="ranks-box-label"><?php echo $pattern['label']; ?></div>
 				<dl class="ranks-datalist">
-					<dt>パターンキー</dt>
+					<dt><span>パターンキー</span></dt>
 					<dd><?php echo $pattern_key; ?></dd>
-					<dt>レート</dt>
+					<dt><span>レート</span></dt>
 					<dd>
 <?php foreach($pattern['rates'] as $account_slug => $rate) : if ($rate == 0 || !isset($accounts[$account_slug]) || !$accounts[$account_slug]['status']) continue; ?>
 						<div class="ranks-rates-input <?php echo $account_slug; ?>">
@@ -25,7 +25,7 @@
 						</div>
 <?php endforeach; ?>
 					</dd>
-					<dt>投稿タイプ</dt>
+					<dt><span>投稿タイプ</span></dt>
 					<dd><?php
 						$types = array();
 						foreach ($pattern['post_type'] as $post_type) {
@@ -34,15 +34,15 @@
 						}
 						echo join('<br>', $types);
 					?></dd>
-					<dt>表示件数</dt>
+					<dt><span>表示件数</span></dt>
 					<dd><?php echo number_format_i18n($pattern['posts_per_page']); ?>位まで表示</dd>
-					<dt>集計期間</dt>
+					<dt><span>集計期間</span></dt>
 					<dd><?php
 						$unit = array_shift(array_keys($pattern['term']));
 						$n = $pattern['term'][$unit];
 						echo sprintf($terms[$unit], $n) . ' <span class="description">(' . date('Y年n月j日', strtotime("$n $unit ago")) . ' から ' . date('Y年n月j日') . ')</span>';
 					?></dd>
-					<dt>自動集計</dt>
+					<dt><span>自動集計</span></dt>
 					<dd><?php
 						if (empty($pattern['schedule_event'])) {
 							echo '<span class="description">(使用しない)</span>';
@@ -62,7 +62,7 @@
 							echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule']) . ')</span>';
 						}
 					?></dd>
-					<dt>ランキングページ</dt>
+					<dt><span>ランキングページ</span></dt>
 					<dd><?php
 						if (empty($pattern['rewrite_rule'])) {
 							echo '<span class="description">(使用しない)</span>';
@@ -75,7 +75,7 @@
 				<div class="ranks-action">
 					<a href="<?php echo $this->url('target_score', array('key'=>$pattern_key)); ?>" class="ranks-action-button">集計実行</a>
 					<a href="<?php echo $this->url('target_preview', array('key'=>$pattern_key)); ?>" class="ranks-action-button">ランキング確認</a>
-					<a href="<?php echo $this->url('target_edit', array('key'=>$pattern_key)); ?>" class="ranks-action-button">設定変更</a>
+					<a href="<?php echo $this->url('target_edit', array('key'=>$pattern_key)); ?>" class="ranks-action-button ranks-action-right">設定変更</a>
 				</div>
 			</div>
 <?php endforeach; ?>
@@ -92,17 +92,17 @@
 			<div class="ranks-box <?php echo $account_slug; if (!$account['status']) echo ' invalid'; ?>">
 				<div class="ranks-box-label"><?php echo $account['label']; ?></div>
 				<dl class="ranks-datalist">
-					<dt>ステータス</dt>
+					<dt><span>ステータス</span></dt>
 					<dd><?php echo $account['status'] ? '有効' : '無効'; ?></dd>
 <?php if (isset($account['profile_id'])) : ?>
-					<dt>プロファイル</dt>
+					<dt><span>プロファイル</span></dt>
 					<dd>
 						<?php echo $account['profile_name'] ? $account['profile_name'] : '未設定'; ?>
 						<span class="description">(<?php echo $account['profile_id'] ? $account['profile_id'] : ''; ?>)</span>
 					</dd>
 <?php endif; ?>
 <?php if (isset($account['term'])) : ?>
-					<dt>データ取得期間</dt>
+					<dt><span>データ取得期間</span></dt>
 					<dd><?php
 						$unit = array_shift(array_keys($account['term']));
 						$n = $account['term'][$unit];
@@ -112,10 +112,13 @@
 				</dl>
 				<div class="ranks-action">
 <?php if ($account['status']) : ?>
-					<a href="<?php echo $this->url('account_count', array('account'=>$account_slug)); ?>" class="ranks-action-button">集計実行</a>
-					<a href="<?php echo $this->url('account_preview', array('account'=>$account_slug)); ?>" class="ranks-action-button">ランキング確認</a>
+					<a href="<?php echo $this->url('account_count', array('account'=>$account_slug)); ?>" class="ranks-action-button">データ更新</a>
+					<a href="<?php echo $this->url('account_preview', array('account'=>$account_slug)); ?>" class="ranks-action-button">データ確認</a>
+<?php else : ?>
+					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled">データ更新</a>
+					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled">データ確認</a>
 <?php endif; ?>
-					<a href="<?php echo $this->url("account_{$account_slug}") ?>" class="ranks-action-button">設定変更</a>
+					<a href="<?php echo $this->url("account_{$account_slug}") ?>" class="ranks-action-button ranks-action-right">設定変更</a>
 				</div>
 			</div>
 <?php endforeach; ?>

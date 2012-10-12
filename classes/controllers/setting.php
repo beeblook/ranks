@@ -189,14 +189,7 @@ class RanksSettingController extends RanksController {
 			exit;
 		}
 
-
-		$timestamp = current_time('timestamp');
-		$ranking = $ranks->pattern_score($key);
-		$processing_time = current_time('timestamp') - $timestamp;
-		$method = 'manual';
-		if (!isset($patterns[$key]['log'])) $patterns[$key]['log'] = array();
-		array_unshift($patterns[$key]['log'], compact('timestamp', 'processing_time', 'ranking', 'method'));
-		update_option('ranks_patterns', $patterns);
+		$ranks->pattern_score($key);
 
 		wp_redirect($this->url('index'));
 		exit;

@@ -186,44 +186,72 @@ input.ranks-remove-button:hover {
 	margin: 10px;
 }
 .ranks-datalist dt {
+	position: relative;
+	margin-bottom: 19px;
+	height: 9px;
+	border-bottom: 1px solid #E9E9E9;
 	font-weight: bold;
 }
+.ranks-datalist dt span {
+	display: inline-block;
+	padding-right: 1em;
+	background: #FFFFFF;
+}
 .ranks-datalist dd {
-	margin: 0 0 1em 1em;
+	margin: 0 0 15px 0;
 }
 
 /**
  * 	Ranks Action
  */
 .ranks-action {
-	margin: 10px;
-	text-align: right;
+	border-top: 1px solid #DEDEDE;
+	background: -moz-linear-gradient(top, #FFFFFF, #F5F5F5);
+	background: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#F5F5F5));
+}
+.ranks-action:after {
+	content: '';
+	display: block;
+	clear: both;
 }
 .ranks-action-button {
-	display: inline-block;
-	padding: 2px 5px;
-	border: 1px solid #DEDEDE;
-	border-radius: 4px;
-	box-shadow: 0 0 2px #EFEFEF;
+	float: left;
+	display: block;
+	padding: 5px 10px;
+	border-width: 0 1px 0 0;
+	border-style: solid;
+	border-color: #DEDEDE;
 	color: #666666;
 	text-align: center;
 	text-shadow: 0 1px 0 #FFFFFF;
 	text-decoration: none;
-	background: #EFEFEF;
-	background: -moz-linear-gradient(top, #F5F5F5, #E9E9E9);
-	background: -webkit-gradient(linear, left top, left bottom, from(#F5F5F5), to(#E9E9E9));
+	background: transparent;
 }
-.ranks-action-button:hover {
-	border: 1px solid #C0C0C0;
+.ranks-action-button:hover,
+.ranks-action-button:focus {
 	color: #777777;
 	background: #F5F5F5;
-	background: -moz-linear-gradient(top, #F9F9F9, #E9E9E9);
-	background: -webkit-gradient(linear, left top, left bottom, from(#F9F9F9), to(#E9E9E9));
+	background: -moz-linear-gradient(top, #FEFEFE, #EFEFEF);
+	background: -webkit-gradient(linear, left top, left bottom, from(#FEFEFE), to(#EFEFEF));
 }
 .ranks-action-button:active {
+	padding: 6px 10px 4px;
 	color: #555555;
-	box-shadow: inset 0px 1px 2px #DEDEDE;
-	background: #E9E9E9;
+	box-shadow: inset 0px 1px 1px #DEDEDE;
+	background: #EFEFEF;
+}
+.ranks-action-right {
+	float: right;
+	border-width: 0 0 0 1px;
+}
+.ranks-action-disabled {
+	color: #C0C0C0;
+}
+.ranks-action-disabled:hover,
+.ranks-action-disabled:focus,
+.ranks-action-disabled:active {
+	color: inherit;
+	background: inherit;
 }
 
 /**

@@ -147,30 +147,36 @@
 
 </form>
 
-<h4>ログ</h4>
-<?php if (!empty($pattern['log'])) : ?>
+
+<h4>集計履歴</h4>
+
 <table class="ranks-posts-table">
 	<thead>
 		<tr>
+			<th>種別</th>
 			<th>日時</th>
 			<th>処理時間</th>
-			<th>実行種別</th>
 			<th>処理結果</th>
 		</tr>
 	</thead>
 	<tbody>
-<?php foreach ($pattern['log'] as $i => $log) : ?>
+<?php if ($pattern['next_schedule']) : ?>
 		<tr>
-			<td><?php echo date('Y年n月j日 H時i分s秒', $log['timestamp']); ?></td>
-			<td><?php echo $log['processing_time'] > 60 ? ceil($log['processing_time'] / 60) . '分' : ($log['processing_time']) . '秒'; ?></td>
-			<td><?php echo $log['method'] == 'manual' ? '手動' : '自動'; ?></td>
-			<td><!-- a href="<?php echo $this->url('target_preview', array('key'=>$key, 'log'=>$i)); ?>">確認</a --></td>
+			<td>予定</td>
+			<td><?php echo date_i18n('Y-m-d H:i:s', $pattern['next_schedule']); ?></td>
+			<td>-</td>
+			<td>-</td>
 		</tr>
-<?php endforeach; ?>
+<?php endif; ?>
+<?php if (!empty($pattern['log'])) : foreach ($pattern['log'] as $i => $log) : ?>
+		<tr>
+			<td><?php echo $log['method'] == 'manual' ? '手動' : '自動'; ?></td>
+			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp']); ?></td>
+			<td><?php echo number_format_i18n($log['processing_time'], 3) . 'ms'; ?></td>
+			<td><a href="javascript:void(0);<?php //echo $this->url('target_preview', array('key'=>$key, 'log'=>$i)); ?>">確認</a></td>
+		</tr>
+<?php endforeach; endif; ?>
 	</tbody>
 </table>
-<?php else : ?>
-<p>ログなし</p>
-<?php endif; ?>
 
 </div>

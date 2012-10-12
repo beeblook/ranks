@@ -171,49 +171,54 @@ class Ranks {
 		if (empty($patterns)) return;
 		foreach (array_keys($patterns) as $key) {
 			if (empty($patterns[$key]['schedule_event'])) continue;
-			if (!wp_next_scheduled("ranks_schedule_{$key}")) {
-				$His = sprintf(' %02s:00:00', $patterns[$key]['schedule_event']['hour']);
+			$schedule_hook = "ranks_schedule_{$key}";
+			if (!wp_next_scheduled($schedule_hook, compact('key'))) {
+				# 次のイベント実行タイムスタンプ（GMT） もっとやりかたありそうなもんだ
+				$next_schedule = null;
+				$hour = sprintf(' %02s:00:00', $patterns[$key]['schedule_event']['hour']);
 				switch ($patterns[$key]['schedule_event']['type']) {
 					case 'daily':
-						$next_schedule = strtotime('tomorrow' . $His);
+						$next_schedule = strtotime('today' . $hour);
+						if ($next_schedule < current_time('timestamp'))
+						$next_schedule = strtotime('tomorrow' . $hour);
 						break;
 					case 'weekly':
 						$week = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
-						$next_schedule = strtotime($week[$patterns[$key]['schedule_event']['week']] . $His);
+						$next_schedule = strtotime('this ' . $week[$patterns[$key]['schedule_event']['week']] . $hour);
+						if ($next_schedule < current_time('timestamp'))
+						$next_schedule = strtotime('next ' . $week[$patterns[$key]['schedule_event']['week']] . $hour);
 						break;
 					case 'monthly':
-						$next_schedule = strtotime(date('Y-m-',strtotime('this month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $His);
-						if ($next_schedule < time())
-						$next_schedule = strtotime(date('Y-m-',strtotime('next month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $His);
+						$next_schedule = strtotime(date('Y-m-',strtotime('this month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour);
+						if ($next_schedule < current_time('timestamp'))
+						$next_schedule = strtotime(date('Y-m-',strtotime('next month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour);
 						break;
 				}
-				$patterns[$key]['next_schedule'] = $next_schedule;
-				// var_dump($next_schedule, $patterns[$key]['next_schedule'], date_i18n('Y-m-d H:i:s', $patterns[$key]['next_schedule']), date('Y-m-d H:i:s', $patterns[$key]['next_schedule']));
-				wp_schedule_single_event($patterns[$key]['next_schedule'], "ranks_schedule_{$key}", compact('key'));
-				update_option('ranks_patterns', $patterns);
+				if ($next_schedule) {
+					wp_schedule_single_event($next_schedule - ( current_time('timestamp') - time() ), $schedule_hook, compact('key'));
+					$patterns[$key]['next_schedule'] = $next_schedule;
+					update_option('ranks_patterns', $patterns);
+				}
 			}
-			add_action("ranks_schedule_{$key}", array($this, 'schedule_event'));
+			add_action($schedule_hook, array($this, 'schedule_event'));
 		}
 	}
 
 	public function schedule_event($key) {
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
-		$patterns = get_option('ranks_patterns', array());
-		$timestamp = current_time('timestamp');
-		$this->account_count(null);
-		$this->pattern_score($key);
-		$processing_time = current_time('timestamp') - $timestamp;
-		$method = __FUNCTION__;
-		array_unshift($patterns[$key]['log'], compact('timestamp', 'processing_time', 'method'));
-		update_option('ranks_patterns', $patterns);
+		$this->account_count(null, 'schedule');
+		$this->pattern_score($key, 'schedule');
 	}
 
 	/**
 	 * Account Logic
 	 */
 
-	public function account_count($target_account = null) {
+	public function account_count($target_account = null, $method = 'manual') {
+
+		$timestamp = current_time('timestamp');
+		$start_microtime = microtime(true);
 
 		$patterns = get_option('ranks_patterns', array());
 		$post_type = array();
@@ -244,6 +249,13 @@ class Ranks {
 			}
 		}
 
+		$processing_time = microtime(true) - $start_microtime;
+		foreach ($count_accounts as $account_slug => $meta_key) {
+			if (!isset($accounts[$account_slug]['log'])) $accounts[$account_slug]['log'] = array();
+			array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
+		}
+		update_option('ranks_patterns', $patterns);
+
 		return true;
 	}
 
@@ -264,7 +276,7 @@ class Ranks {
 		static $report;
 
 		if(is_null($report)){
-			$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+			$accounts = get_option('ranks_accounts', array());
 			if (!isset($accounts['analytics']['auth_token'])) return 0;
 			$ga = new gapi(null, null, $accounts['analytics']['auth_token']);
 			$unit = array_shift(array_keys($accounts['analytics']['term']));
@@ -298,15 +310,15 @@ class Ranks {
 	 * Pattern Logic
 	 */
 
-	public function pattern_score($key){
+	public function pattern_score($key, $method = 'manual'){
+
+		$timestamp = current_time('timestamp');
+		$start_microtime = microtime(true);
 
 		$patterns = get_option('ranks_patterns', array());
 		$accounts = get_option('ranks_accounts', array());
 
-		if (!isset($patterns[$key])) {
-			wp_redirect($this->url('index'));
-			exit;
-		}
+		if (!isset($patterns[$key])) return false;
 
 		delete_post_meta_by_key($key);
 
@@ -339,10 +351,12 @@ class Ranks {
 		foreach ($ranking as $data) {
 			$sort[] = $data['score'];
 		}
-
 		array_multisort($sort, SORT_DESC, $ranking);
 
-		return $ranking;
+		$processing_time = microtime(true) - $start_microtime;
+		if (!isset($patterns[$key]['log'])) $patterns[$key]['log'] = array();
+		array_unshift($patterns[$key]['log'], compact('timestamp', 'processing_time', 'ranking', 'method'));
+		update_option('ranks_patterns', $patterns);
 	}
 
 	public function pattern_score_where($where, $wp_query) {
