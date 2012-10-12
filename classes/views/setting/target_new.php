@@ -23,7 +23,7 @@
 				<input class="regular-text" type="text" name="label" placeholder="名称" value="<?php echo esc_attr($pattern['label']); ?>" /><br>
 				<input class="regular-text" type="text" name="key" placeholder="キー" value="<?php echo $key; ?>" />
 				<span class="description">キーは半角英数字で入力してください。</span><br>
-				<span class="description">ランキングは <code>query_posts('meta_key=[キー]&amp;orderby=meta_value_num&amp;order=desc');</code> で取得可能になります。</span>
+				<span class="description">ランキングは <code>query_posts('<?php echo "{$ranks->query_var}=[キー]"; ?>');</code> で取得可能になります。</span>
 			</td>
 		</tr>
 		<tr>

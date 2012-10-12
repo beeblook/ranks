@@ -124,8 +124,15 @@ class RanksSettingController extends RanksController {
 
 				$patterns[$key]['label'] = $_POST['label'];
 				$patterns[$key]['post_type'] = $_POST['post_type'];
+				$patterns[$key]['posts_per_page'] = intval($_POST['posts_per_page']);
 				$patterns[$key]['term'] = array($_POST['term']['unit']=>$_POST['term']['n']);
 				$patterns[$key]['rates'] = array_map('floatval', $_POST['rates']);
+				$patterns[$key]['rewrite_rule'] = isset($_POST['create_rewrite_rule']) && $_POST['create_rewrite_rule'] == 'create' ? $_POST['rewrite_rule'] : null;
+				$patterns[$key]['schedule_event'] = isset($_POST['enable_schedule_event']) && $_POST['enable_schedule_event'] == 'enable' ? $_POST['schedule_event'] : array();
+				$patterns[$key]['next_schedule'] = null;
+
+				wp_clear_scheduled_hook("ranks_schedule_{$key}", compact('key'));
+
 				update_option('ranks_patterns', $patterns);
 				$message = 1;
 
@@ -148,6 +155,7 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function target_preview() {
+		global $ranks;
 
 		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
 		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
@@ -159,31 +167,20 @@ class RanksSettingController extends RanksController {
 			exit;
 		}
 
-		$pattern = $patterns[$key];
-
 		query_posts(array(
-			'post_type' => $pattern['post_type'],
-			'posts_per_page' => 500,
-			'post_status' => 'publish',
-			'meta_key' => $key,
-			// 'meta_query' => array(
-				// array(
-					// 'key' => $key,
-					// 'value' => '0',
-					// 'compare' => '>',
-				// ),
-			// ),
-			'orderby' => 'meta_value_num',
-			'order' => 'desc',
+			$ranks->query_var => $key,
 		));
+
+
+		$pattern = $patterns[$key];
 
 		return compact('accounts', 'key', 'pattern');
 	}
 
 	public function target_score(){
+		global $ranks;
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = get_option('ranks_patterns', array());
 
 		$key = $_GET['key'];
 
@@ -192,39 +189,17 @@ class RanksSettingController extends RanksController {
 			exit;
 		}
 
-		delete_post_meta_by_key($key);
 
-		add_filter('posts_where', array($this, 'target_score_where'), 10, 2);
-
-		$unit = array_shift(array_keys($patterns[$key]['term']));
-		$n = $patterns[$key]['term'][$unit];
-		query_posts(array(
-			'post_type' => $patterns[$key]['post_type'],
-			'posts_per_page' => -1,
-			'post_status' => 'publish',
-			'post_ago' => date_i18n('Y-m-d 00:00:00', strtotime("$n $unit ago")),
-		));
-
-		while(have_posts()){
-			the_post();
-			$score = array();
-			foreach ($accounts as $account_slug => $account) {
-				if (!$account['status']) continue;
-				$score[] = $patterns[$key]['rates'][$account_slug] * (int) get_post_meta(get_the_ID(), "ranks_{$account_slug}_count", true);
-			}
-			update_post_meta(get_the_ID(), $key, array_sum($score));
-		}
+		$timestamp = current_time('timestamp');
+		$ranking = $ranks->pattern_score($key);
+		$processing_time = current_time('timestamp') - $timestamp;
+		$method = 'manual';
+		if (!isset($patterns[$key]['log'])) $patterns[$key]['log'] = array();
+		array_unshift($patterns[$key]['log'], compact('timestamp', 'processing_time', 'ranking', 'method'));
+		update_option('ranks_patterns', $patterns);
 
 		wp_redirect($this->url('index'));
 		exit;
-	}
-
-	public function target_score_where($where, $wp_query) {
-		global $wpdb;
-		if (!isset($wp_query->query_vars['post_ago'])) return $where;
-		$where.= $wpdb->prepare(" AND {$wpdb->posts}.post_date >= %s", $wp_query->query_vars['post_ago']);
-		var_dump($where);
-		return $where;
 	}
 
 	public function account_analytics() {
@@ -392,104 +367,24 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function account_count() {
+		global $ranks;
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
 		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
 
 		$account_slug = $_GET['account'];
-
 		if (!isset($accounts[$account_slug])) {
 			wp_redirect($this->url('index'));
 			exit;
 		}
-		// $account = $accounts[$account_slug];
-		
-		$meta_key = "ranks_{$account_slug}_count";
 
-		$post_type = array();
-		foreach ($patterns as $pattern) {
-			$post_type = array_merge($post_type, $pattern['post_type']);
-		}
-		$post_type = array_unique($post_type);
+		$timestamp = current_time('timestamp');
+		$ranks->account_count($account_slug);
+		$processing_time = current_time('timestamp') - $timestamp;
+		$method = 'manual';
+		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
 
-		ini_set('memory_limit', '256M');
-		set_time_limit(-1);
-
-		$per = 100;
-		$p = isset($_GET['p'])?intval($_GET['p']):1;
-
-		if ($p == 1) {
-			delete_post_meta_by_key($meta_key);
-		}
-
-		query_posts(array(
-			'post_type' => $post_type,
-			'posts_per_page' => $per,
-			'offset' => $per * ( $p - 1 ),
-			'post_status' => 'publish',
-		));
-
-		while(have_posts()){
-			the_post();
-			$count = $this->get_account_count($account_slug);
-			update_post_meta(get_the_ID(), $meta_key, $count);
-		}
-
-		global $wp_query;
-		if($wp_query->post_count == $per) {
-			wp_redirect($this->url(__FUNCTION__, array('account' => $account_slug, 'p' => $p+1)));
-		} else {
-			wp_redirect($this->url('index'));
-		}
+		wp_redirect($this->url('index'));
 		exit;
-
-	}
-
-	public function get_account_count($account_slug, $post_id=null) {
-		switch ($account_slug) {
-			case 'analytics':
-				return $this->get_analytics_pageview($post_id);
-			case 'facebook':
-				return $this->get_facebook_like($post_id);
-			case 'twitter':
-				return $this->get_twitter_tweet($post_id);
-			default:
-				return 0;
-		}
-	}
-
-	public function get_analytics_pageview($post_id=null) {
-		static $report;
-
-		if(is_null($report)){
-			$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
-			if (!isset($accounts['analytics']['auth_token'])) return 0;
-			$ga = new gapi(null, null, $accounts['analytics']['auth_token']);
-			$unit = array_shift(array_keys($accounts['analytics']['term']));
-			$n = $accounts['analytics']['term'][$unit];
-			$start_date = date('Y-m-d', strtotime("$n $unit ago"));
-			$end_date = date('Y-m-d');
-			$start_index = 1;
-			$max_resluts = 1000;
-			$ga->requestReportData($accounts['analytics']['profile_id'], 'pagePath', 'pageviews', '-pageviews', null, $start_date, $end_date, $start_index, $max_resluts);
-			foreach($ga->getResults() as $result) {
-				$report[(string) $result] = $result->getPageviews();
-			}
-		}
-
-		$url = parse_url(get_permalink($post_id));
-		$pagepath = urldecode($url['path']);
-		return isset($report[$pagepath]) ? (int) $report[$pagepath] : 0;
-	}
-
-	public function get_facebook_like($post_id=null) {
-		$result = json_decode(file_get_contents('https://graph.facebook.com/'.get_permalink($post_id)));
-		return (int) $result->shares;
-	}
-
-	public function get_twitter_tweet($post_id=null) {
-		$result = json_decode(file_get_contents('http://urls.api.twitter.com/1/urls/count.json?url='.get_permalink($post_id)));
-		return (int) $result->count;
 	}
 
 }

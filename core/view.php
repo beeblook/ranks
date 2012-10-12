@@ -10,6 +10,7 @@ class RanksView {
 	}
 
 	public function html() {
+		global $ranks, $wp_locale;
 		$view_file = RANKS_DIR . '/classes/views/' . $this->controller->controller . '/' . $this->controller->action . '.php';
 		if (!file_exists($view_file)) return false;
 		$title = $this->controller->page_title;
