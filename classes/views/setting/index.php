@@ -124,6 +124,72 @@
 <?php endforeach; ?>
 		</td>
 	</tr>
+	<tr>
+		<th>
+			<p><strong>集計スケジュール</strong></p>
+			<p>予定されている自動集計</p>
+			<p>サーバーの時刻:<br><?php echo date_i18n('Y-m-d H:i:s'); ?></p>
+		</th>
+		<td>
+
+<table class="ranks-schedule-table">
+	<thead>
+		<tr>
+			<th>日時</th>
+			<th>集計パターン</th>
+			<th>使用データソース</th>
+		</tr>
+	</thead>
+	<tbody>
+<?php if (!empty($schedule)) : foreach ($schedule as $log) : ?>
+		<tr>
+			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp']); ?></td>
+			<td><?php echo $log['pattern_label']; ?></td>
+			<td><?php echo join(', ', $log['account_label']); ?></td>
+		</tr>
+<?php endforeach; endif; ?>
+	</tbody>
+</table>
+
+		</td>
+	</tr>
+	<tr>
+		<th>
+			<p><strong>集計履歴</strong></p>
+			<p>実行された集計履歴</p>
+		</th>
+		<td>
+
+<table class="ranks-schedule-table">
+	<thead>
+		<tr>
+			<th>日時</th>
+			<th>ジョブ</th>
+			<th>処理時間</th>
+			<th>種別</th>
+		</tr>
+	</thead>
+	<tbody>
+<?php if (!empty($logs)) : $l = 0; foreach ($logs as $log) : $l++; if ($l > 10) break; ?>
+		<tr>
+			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp']); ?></td>
+			<td><?php echo $log['label']; ?></td>
+			<td class="microtime"><?php
+				if ($log['time'] < 60) {
+					echo number_format_i18n($log['time']) . '秒';
+				} else {
+					echo number_format_i18n(floor($log['time']/60)) . '分';
+					echo number_format_i18n($log['time']%60) . '秒';
+				}
+			?></td>
+			<td><?php echo $log['method'] == 'manual' ? '手動' : '自動'; ?></td>
+		</tr>
+<?php endforeach; endif; ?>
+	</tbody>
+</table>
+
+		</td>
+	</tr>
 </table>
 
 </div>

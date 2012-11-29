@@ -45,7 +45,46 @@ class RanksSettingController extends RanksController {
 		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
 		$analytics_profile = get_option('ranks_analytics_profile_name', false);
 
-		return compact('terms', 'patterns', 'accounts', 'analytics_mailaddress', 'analytics_profile');
+		$sort = $schedule = $logs = array();
+		foreach ($patterns as $key => $pattern) {
+			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", compact('key'))) {
+				$timestamp = $next_schedule + (current_time('timestamp') - time());
+				$pattern_label = $pattern['label'];
+				$account_label = array();
+				foreach ($accounts as $slug => $account) {
+					if (isset($pattern['rates'][$slug]) && $pattern['rates'][$slug] > 0) $account_label[] = $account['label'];
+				}
+				$schedule[] = compact('timestamp', 'pattern_label', 'account_label');
+				$sort['schedule'][] = $timestamp;
+			}
+			if (!empty($pattern['log'])) {
+				foreach ($pattern['log'] as $i => $log) {
+					$method = $log['method'];
+					$timestamp = $log['timestamp'];
+					$label = $pattern['label'].' 集計実行';
+					$time = $log['processing_time'];
+					$logs[] = compact('method', 'timestamp', 'key', 'label', 'time');
+					$sort['log'][] = $timestamp;
+				}
+			}
+		}
+		foreach ($accounts as $slug => $account) {
+			if (!empty($account['log'])) {
+				foreach ($account['log'] as $i => $log) {
+					$method = $log['method'];
+					$timestamp = $log['timestamp'];
+					$label = $account['label'].' データ更新';
+					$time = $log['processing_time'];
+					$logs[] = compact('method', 'timestamp', 'slug', 'label', 'time');
+					$sort['log'][] = $timestamp;
+				}
+			}
+		}
+
+		array_multisort($sort['schedule'], SORT_DESC, $schedule);
+		array_multisort($sort['log'], SORT_DESC, $logs);
+
+		return compact('terms', 'patterns', 'schedule', 'logs', 'accounts', 'analytics_mailaddress', 'analytics_profile');
 	}
 
 	public function target_new() {
@@ -129,7 +168,6 @@ class RanksSettingController extends RanksController {
 				$patterns[$key]['rates'] = array_map('floatval', $_POST['rates']);
 				$patterns[$key]['rewrite_rule'] = isset($_POST['create_rewrite_rule']) && $_POST['create_rewrite_rule'] == 'create' ? $_POST['rewrite_rule'] : null;
 				$patterns[$key]['schedule_event'] = isset($_POST['enable_schedule_event']) && $_POST['enable_schedule_event'] == 'enable' ? $_POST['schedule_event'] : array();
-				$patterns[$key]['next_schedule'] = null;
 
 				wp_clear_scheduled_hook("ranks_schedule_{$key}", compact('key'));
 
@@ -189,6 +227,9 @@ class RanksSettingController extends RanksController {
 			exit;
 		}
 
+		ini_set('memory_limit', '256M');
+		set_time_limit(-1);
+
 		$ranks->pattern_score($key);
 
 		wp_redirect($this->url('index'));
@@ -232,7 +273,7 @@ class RanksSettingController extends RanksController {
 				try {
 					$ga = new gapi($_POST['mailaddress'], $_POST['password']);
 					$auth_token = $ga->getAuthToken();
-					
+
 					$accounts['analytics']['status'] = false;
 					$accounts['analytics']['auth_token'] = $auth_token;
 					update_option('ranks_accounts', $accounts);
@@ -369,6 +410,9 @@ class RanksSettingController extends RanksController {
 			wp_redirect($this->url('index'));
 			exit;
 		}
+
+		ini_set('memory_limit', '256M');
+		set_time_limit(-1);
 
 		$timestamp = current_time('timestamp');
 		$ranks->account_count($account_slug);
