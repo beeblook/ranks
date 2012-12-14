@@ -469,6 +469,7 @@ class Ranks {
 				}
 			}
 		}
+		return $likes;
 	}
 
 	public function get_facebook_like($post_id=null) {
