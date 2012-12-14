@@ -191,7 +191,9 @@
 			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp']); ?></td>
 			<td><?php echo $log['label']; ?></td>
 			<td class="microtime"><?php
-				if ($log['time'] < 60) {
+				if ($log['time'] < 10) {
+					echo number_format_i18n($log['time'], 1) . '秒';
+				} elseif ($log['time'] < 60) {
 					echo number_format_i18n($log['time']) . '秒';
 				} else {
 					echo number_format_i18n(floor($log['time']/60)) . '分';

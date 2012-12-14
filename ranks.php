@@ -11,6 +11,9 @@ Version: 0.1.1
 define('RANKS_VER', '0.1.1');
 define('RANKS_DIR', dirname(__FILE__));
 
+define('RANKS_FACEBOOK_APP_ID', '172810956175838');
+define('RANKS_FACEBOOK_APP_SECRET', '25ee6e8dc5ee0f03ccd8d3affc7d2da4');
+
 $ranks = new Ranks();
 
 function is_ranks($key = null) {
@@ -188,7 +191,6 @@ class Ranks {
 	}
 
 	public function get_ranks_link($key = null) {
-		if (is_null($format)) $format = get_option('date_format');
 		$pattern = $this->get_ranks_pattern();
 		return home_url($pattern['rewrite_rule']);
 	}
@@ -337,6 +339,7 @@ class Ranks {
 
 		if (!empty($count_accounts)) {
 
+			// 対象記事の取得
 			$posts = get_posts(array(
 				'post_type' => $this->get_use_post_types(),
 				'posts_per_page' => -1,
@@ -349,16 +352,20 @@ class Ranks {
 
 				$timestamp = current_time('timestamp');
 
-				if ($meta_key) {
+				// 既存データを破棄
+				delete_post_meta_by_key($meta_key);
 
-					// 既存データを破棄
-					delete_post_meta_by_key($meta_key);
-
+				if ($account_slug == 'facebook') {
+					$likes = $this->batch_facebook_like($posts);
+					foreach ($posts as $post) {
+						$meta_value = isset($likes[$post->ID]) ? $likes[$post->ID] : 0;
+						update_post_meta($post->ID, $meta_key, $meta_value);
+					}
+				} else {
 					foreach ($posts as $post) {
 						$meta_value = $this->get_account_count($account_slug, $post->ID);
 						update_post_meta($post->ID, $meta_key, $meta_value);
 					}
-
 				}
 
 				$processing_time = microtime(true) - $start_microtime;
@@ -426,6 +433,44 @@ class Ranks {
 		return isset($report[$pagepath]) ? (int) $report[$pagepath] : 0;
 	}
 
+	public function batch_facebook_like($posts) {
+		static $access_token;
+		if (!$access_token) {
+			$url = 'https://graph.facebook.com/oauth/access_token';
+			$args = array(
+				'client_id' => RANKS_FACEBOOK_APP_ID,
+				'client_secret' => RANKS_FACEBOOK_APP_SECRET,
+				'grant_type' => 'client_credentials',
+			);
+			parse_str(file_get_contents(add_query_arg($args, $url)), $result);
+			$access_token = $result['access_token'];
+		}
+		$likes = array();
+		$length = 50;
+		$total = count($posts);
+		for ($offset = 0; $offset < $total; $offset+=$length) {
+			$sliced_posts = array_slice($posts, $offset, $length);
+			$ids = array();
+			$batch = array();
+			foreach ($sliced_posts as $post) {
+				$ids[] = $post->ID;
+				$batch[] = array(
+					'method' => 'GET',
+					'relative_url' => get_permalink($post->ID),
+				);
+			}
+			$batch = json_encode($batch);
+			$return = $this->curl('https://graph.facebook.com', compact('access_token', 'batch'));
+			$results = json_decode($return);
+			foreach ($ids as $i => $id) {
+				if (isset($results[$i]) && $results[$i]->code == 200 && $results[$i]->body) {
+					$result = json_decode($results[$i]->body);
+					$likes[$id] = isset($result->shares) ? (int) $result->shares : 0;
+				}
+			}
+		}
+	}
+
 	public function get_facebook_like($post_id=null) {
 		$result = json_decode(file_get_contents('https://graph.facebook.com/'.get_permalink($post_id)));
 		return isset($result->shares) ? (int) $result->shares : 0;
@@ -449,16 +494,18 @@ class Ranks {
 		if (!isset($patterns[$key])) return false;
 
 		// 無効は除外
-		if (!$patterns[$key]['status']) return false;
+		// if (!$patterns[$key]['status']) return false;
 
 		// 対象記事の取得
-		add_filter('posts_where', array($this, 'pattern_score_where'), 10, 2);
-		$post_ago = sprintf("%s %s ago", array_shift(array_keys($patterns[$key]['term'])), $patterns[$key]['term'][$unit]);
+		add_filter('posts_where', array($this, 'post_ago_where'), 10, 2);
+		$term = array_shift(array_keys($patterns[$key]['term']));
+		$post_ago = sprintf("%s %s ago", $patterns[$key]['term'][$term], $term);
 		$posts = get_posts(array(
 			'post_type' => $patterns[$key]['post_type'],
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 			'post_ago' => $post_ago,
+			'suppress_filters' => false,
 		));
 
 		// 既存データを破棄
@@ -505,10 +552,11 @@ class Ranks {
 		update_option('ranks_patterns', $patterns);
 	}
 
-	public function pattern_score_where($where, $wp_query) {
+	public function post_ago_where($where, $wp_query) {
 		global $wpdb;
 		if (!isset($wp_query->query_vars['post_ago'])) return $where;
-		$where.= $wpdb->prepare(" AND {$wpdb->posts}.post_date >= %s", $wp_query->query_vars['post_ago']);
+		$post_ago = date_i18n('Y-m-d H:i:s', strtotime('today '.$wp_query->query_vars['post_ago']));
+		$where.= $wpdb->prepare(" AND {$wpdb->posts}.post_date >= %s", $post_ago);
 		return $where;
 	}
 
@@ -527,4 +575,16 @@ class Ranks {
 		return $url;
 	}
 
+	public function curl($url, $post = array()) {
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL, $url);
+		if (!empty($post)) {
+			curl_setopt($curl, CURLOPT_POST, true);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
+		}
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		$result = curl_exec($curl);
+		curl_close($curl);
+		return $result;
+	}
 }
