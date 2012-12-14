@@ -5,10 +5,10 @@ Plugin URI: http://
 Description: Analytics・Facebook・Twitterからランキングを作ります。
 Author: colorchips
 Author URI: http://www.colorchips.co.jp/
-Version: 0.1.0
+Version: 0.1.1
 */
 
-define('RANKS_VER', '0.1.0');
+define('RANKS_VER', '0.1.1');
 define('RANKS_DIR', dirname(__FILE__));
 
 $ranks = new Ranks();
@@ -260,34 +260,43 @@ class Ranks {
 		foreach (array_keys($patterns) as $key) {
 			if (empty($patterns[$key]['schedule_event'])) continue;
 			$schedule_hook = "ranks_schedule_{$key}";
+
+			// スケジュールが未設定の場合、次のスケジュールを設定する
 			if (!wp_next_scheduled($schedule_hook, compact('key'))) {
-				# 次のイベント実行タイムスタンプ（GMT） もっとやりかたありそうなもんだ
+				// 次回実行時間を計算する
 				$next_schedule = null;
+				$gmt_offset = get_option('gmt_offset') * 3600;
 				$hour = sprintf(' %02s:00:00', $patterns[$key]['schedule_event']['hour']);
+				$now = time();
 				switch ($patterns[$key]['schedule_event']['type']) {
+					// 日次
 					case 'daily':
-						$next_schedule = strtotime('today' . $hour);
-						if ($next_schedule < current_time('timestamp'))
-						$next_schedule = strtotime('tomorrow' . $hour);
+						$next_schedule = strtotime('today' . $hour) - $gmt_offset;
+						if ($next_schedule < $now)
+						$next_schedule = strtotime('tomorrow' . $hour) - $gmt_offset;
 						break;
+					// 週次
 					case 'weekly':
 						$week = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
-						$next_schedule = strtotime('this ' . $week[$patterns[$key]['schedule_event']['week']] . $hour);
-						if ($next_schedule < current_time('timestamp'))
-						$next_schedule = strtotime('next ' . $week[$patterns[$key]['schedule_event']['week']] . $hour);
+						$next_schedule = strtotime('this ' . $week[$patterns[$key]['schedule_event']['week']] . $hour) - $gmt_offset;
+						if ($next_schedule < $now)
+						$next_schedule = strtotime('next ' . $week[$patterns[$key]['schedule_event']['week']] . $hour) - $gmt_offset;
 						break;
+					// 月次
 					case 'monthly':
-						$next_schedule = strtotime(date('Y-m-',strtotime('this month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour);
-						if ($next_schedule < current_time('timestamp'))
-						$next_schedule = strtotime(date('Y-m-',strtotime('next month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour);
+						$next_schedule = strtotime(date('Y-m-',strtotime('this month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour) - $gmt_offset;
+						if ($next_schedule < $now)
+						$next_schedule = strtotime(date('Y-m-',strtotime('next month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour) - $gmt_offset;
 						break;
-				}
+				};
 				if ($next_schedule) {
-					wp_schedule_single_event($next_schedule - ( current_time('timestamp') - time() ), $schedule_hook, compact('key'));
+					wp_schedule_single_event($next_schedule, $schedule_hook, compact('key'));
 					$patterns[$key]['next_schedule'] = $next_schedule;
 					update_option('ranks_patterns', $patterns);
 				}
 			}
+
+			// スケジュールイベントのフック
 			add_action($schedule_hook, array($this, 'schedule_event'));
 		}
 	}
@@ -297,9 +306,10 @@ class Ranks {
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
 		$pattern = $this->get_ranks_pattern($key);
-		$target_account = array_keys($pattern['rates']);
+		$target_account = array_keys(array_filter($pattern['rates']));
 		$this->account_count($target_account, 'schedule');
 		$this->pattern_score($key, 'schedule');
+		$this->schedule();
 	}
 
 	/**
@@ -321,17 +331,7 @@ class Ranks {
 			// ターゲット指定の場合、指定以外は除外
 			if ((!empty($target_account) && !in_array($account_slug, $target_account))) continue;
 
-			// 自動集計時に集計直後(60分以内)はスキップ
-			if ($method != 'manual') {
-				$lastlog = isset($account['log']) && !empty($account['log']) ? array_shift(array_values($account['log'])) : null;
-				if (!is_null($lastlog) && current_time('timestamp') - (60*60) <= $lastlog['timestamp']) {
-					$count_accounts[$account_slug] = false;
-				} else {
-					$count_accounts[$account_slug] = "ranks_{$account_slug}_count";
-				}
-			} else {
-				$count_accounts[$account_slug] = "ranks_{$account_slug}_count";
-			}
+			$count_accounts[$account_slug] = "ranks_{$account_slug}_count";
 
 		}
 
@@ -375,6 +375,11 @@ class Ranks {
 					$accounts[$account_slug]['log'] = array_slice($accounts[$account_slug]['log'], 0, 10);
 				}
 
+				// ログファイル
+				if (is_writable(RANKS_DIR.'/schedule.log')) {
+					$log = date_i18n('[Y-m-d H:i:s T]') . ' ' . $account_slug . ' (' . $processing_time . ' sec)';
+					file_put_contents(RANKS_DIR.'/schedule.log', $log.PHP_EOL, FILE_APPEND | LOCK_EX);
+				}
 			}
 
 		}
@@ -444,13 +449,7 @@ class Ranks {
 		if (!isset($patterns[$key])) return false;
 
 		// 無効は除外
-		// if (!$patterns[$key]['status']) return false;
-
-		// 自動集計時に集計直後(60分以内)はスキップ
-		if ($method != 'manual') {
-			$lastlog = isset($patterns[$key]['log']) && !empty($patterns[$key]['log']) ? array_shift(array_values($patterns[$key]['log'])) : null;
-			if (!is_null($lastlog) && current_time('timestamp') - (60*60) <= $lastlog['timestamp']) return false;
-		}
+		if (!$patterns[$key]['status']) return false;
 
 		// 対象記事の取得
 		add_filter('posts_where', array($this, 'pattern_score_where'), 10, 2);
@@ -495,6 +494,12 @@ class Ranks {
 		// ログは10世代まで
 		if (count($patterns[$key]['log']) > 10) {
 			$patterns[$key]['log'] = array_slice($patterns[$key]['log'], 0, 10);
+		}
+
+		// ログファイル
+		if (is_writable(RANKS_DIR.'/schedule.log')) {
+			$log = date_i18n('[Y-m-d H:i:s T]') . ' ' . $key . ' (' . $processing_time . ' sec)';
+			file_put_contents(RANKS_DIR.'/schedule.log', $log.PHP_EOL, FILE_APPEND | LOCK_EX);
 		}
 
 		update_option('ranks_patterns', $patterns);

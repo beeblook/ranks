@@ -48,7 +48,7 @@ class RanksSettingController extends RanksController {
 		$sort = $schedule = $logs = array();
 		foreach ($patterns as $key => $pattern) {
 			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", compact('key'))) {
-				$timestamp = $next_schedule + (current_time('timestamp') - time());
+				$timestamp = $next_schedule;
 				$pattern_label = $pattern['label'];
 				$account_label = array();
 				foreach ($accounts as $slug => $account) {

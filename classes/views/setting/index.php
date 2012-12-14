@@ -59,7 +59,7 @@
 									break;
 							}
 							echo ' ' . $pattern['schedule_event']['hour'] . '時に実行';
-							echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule']) . ')</span>';
+							echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
 						}
 					?></dd>
 					<dt><span>ランキングページ</span></dt>
@@ -138,14 +138,30 @@
 			<th>日時</th>
 			<th>集計パターン</th>
 			<th>使用データソース</th>
+			<th>残り</th>
 		</tr>
 	</thead>
 	<tbody>
-<?php if (!empty($schedule)) : foreach ($schedule as $log) : ?>
-		<tr>
-			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp']); ?></td>
+<?php if (!empty($schedule)) : foreach ($schedule as $log) : $now = time(); ?>
+		<tr style="<?php echo $log['timestamp'] < $now ? 'color: red;' : ''; ?>">
+			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp'] + ( get_option( 'gmt_offset' ) * 3600 )); ?></td>
 			<td><?php echo $log['pattern_label']; ?></td>
 			<td><?php echo join(', ', $log['account_label']); ?></td>
+			<td><?php
+				$time = $log['timestamp'] - $now;
+				if ($time < 0) {
+					echo '処理中';
+				} elseif ($time < 60) {
+					echo number_format_i18n($time) . '秒';
+				} elseif ($time < 3600) {
+					echo number_format_i18n(floor($time/60)) . '分';
+					echo number_format_i18n($time%60) . '秒';
+				} elseif ($time < 86400) {
+					echo number_format_i18n(ceil($time/3600)) . '時間';
+				} else {
+					echo number_format_i18n(ceil($time/86400)) . '日';
+				}
+			?></td>
 		</tr>
 <?php endforeach; endif; ?>
 	</tbody>

@@ -261,8 +261,10 @@ input.ranks-remove-button:hover {
 	margin: 10px;
 	max-width: 1000px;
 	border: 1px solid #DEDEDE;
+	border-radius: 3px;
 	background: #FFFFFF;
 	box-shadow: 0 0 2px #EFEFEF;
+	overflow: hidden;
 }
 .ranks-box.invalid {
 	color: #C0C0C0;
