@@ -81,8 +81,11 @@ class RanksSettingController extends RanksController {
 			}
 		}
 
-		array_multisort($sort['schedule'], SORT_DESC, $schedule);
-		array_multisort($sort['log'], SORT_DESC, $logs);
+		if (isset($sort['schedule']))
+			array_multisort($sort['schedule'], SORT_DESC, $schedule);
+
+		if (isset($sort['log']))
+			array_multisort($sort['log'], SORT_DESC, $logs);
 
 		return compact('terms', 'patterns', 'schedule', 'logs', 'accounts', 'analytics_mailaddress', 'analytics_profile');
 	}
