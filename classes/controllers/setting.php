@@ -45,7 +45,8 @@ class RanksSettingController extends RanksController {
 		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
 		$analytics_profile = get_option('ranks_analytics_profile_name', false);
 
-		$sort = $schedule = $logs = array();
+		$sort = array('schedule'=>array(), 'log'=>array());
+		$schedule = $logs = array();
 		foreach ($patterns as $key => $pattern) {
 			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", compact('key'))) {
 				$timestamp = $next_schedule;
