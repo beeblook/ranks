@@ -265,35 +265,43 @@ class Ranks {
 
 			// スケジュールが未設定の場合、次のスケジュールを設定する
 			if (!wp_next_scheduled($schedule_hook, compact('key'))) {
+
+				// タイムゾーン
+				$tz = get_option('timezone_string');
+				if (!$tz) {
+					$o = get_option('gmt_offset');
+					$tz = sprintf('%s%02d%02d', $o<0?'-':'+', floor(abs($o)), (abs($o)-floor(abs($o)))*60);
+				}
+
 				// 次回実行時間を計算する
-				$next_schedule = null;
-				$gmt_offset = get_option('gmt_offset') * 3600;
-				$hour = sprintf(' %02s:00:00', $patterns[$key]['schedule_event']['hour']);
-				$now = time();
+				$time = sprintf('%02s:00:00', $patterns[$key]['schedule_event']['hour']);
 				switch ($patterns[$key]['schedule_event']['type']) {
-					// 日次
 					case 'daily':
-						$next_schedule = strtotime('today' . $hour) - $gmt_offset;
-						if ($next_schedule < $now)
-						$next_schedule = strtotime('tomorrow' . $hour) - $gmt_offset;
+						$next_schedule = new DateTime(sprintf('today %s %s', $time, $tz));
+						if ($next_schedule->format('U') < time()) $next_schedule->modify('+1 day');
 						break;
-					// 週次
+
 					case 'weekly':
 						$week = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
-						$next_schedule = strtotime('this ' . $week[$patterns[$key]['schedule_event']['week']] . $hour) - $gmt_offset;
-						if ($next_schedule < $now)
-						$next_schedule = strtotime('next ' . $week[$patterns[$key]['schedule_event']['week']] . $hour) - $gmt_offset;
+						$next_schedule = new DateTime(sprintf("%s %s %s", $week[$patterns[$key]['schedule_event']['week']], $time, $tz));
+						if ($next_schedule->format('U') < time()) $next_schedule->modify('+1 week');
 						break;
-					// 月次
+
 					case 'monthly':
-						$next_schedule = strtotime(date('Y-m-',strtotime('this month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour) - $gmt_offset;
-						if ($next_schedule < $now)
-						$next_schedule = strtotime(date('Y-m-',strtotime('next month')) . sprintf('%02s', $patterns[$key]['schedule_event']['day']) . $hour) - $gmt_offset;
+						$this_month = new DateTime(sprintf('this month %s', $tz));
+						$next_schedule = new DateTime(sprintf('%s %s %s', $this_month->format('Y-m-01'), $time, $tz));
+						$next_schedule->modify(sprintf('+%d day', $patterns[$key]['schedule_event']['day'] - 1));
+						if ($next_schedule->format('U') < time()) $next_schedule->modify('+1 month');
+						break;
+
+					default:
+						$next_schedule = false;
 						break;
 				};
+
 				if ($next_schedule) {
-					wp_schedule_single_event($next_schedule, $schedule_hook, compact('key'));
-					$patterns[$key]['next_schedule'] = $next_schedule;
+					wp_schedule_single_event($next_schedule->format('U'), $schedule_hook, compact('key'));
+					$patterns[$key]['next_schedule'] = $next_schedule->format('U');
 					update_option('ranks_patterns', $patterns);
 				}
 			}
