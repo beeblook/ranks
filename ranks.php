@@ -14,6 +14,9 @@ define('RANKS_DIR', dirname(__FILE__));
 define('RANKS_FACEBOOK_APP_ID', '172810956175838');
 define('RANKS_FACEBOOK_APP_SECRET', '25ee6e8dc5ee0f03ccd8d3affc7d2da4');
 
+define('RANKS_GOOGLE_API_ID', '245825365986-319dtcf5a896q5uab2egd62oisnr11nv.apps.googleusercontent.com');
+define('RANKS_GOOGLE_API_SECRET', 'S9vy61O54V6eBZwFliSB5uJZ');
+
 $ranks = new Ranks();
 
 function is_ranks($key = null) {
@@ -418,27 +421,70 @@ class Ranks {
 	public function get_analytics_pageview($post_id=null) {
 		static $report;
 
-		require_once RANKS_DIR . '/libraries/gapi.class.php';
-
 		if(is_null($report)){
 			$accounts = get_option('ranks_accounts', array());
-			if (!isset($accounts['analytics']['auth_token'])) return 0;
-			$ga = new gapi(null, null, $accounts['analytics']['auth_token']);
-			$unit = array_shift(array_keys($accounts['analytics']['term']));
-			$n = $accounts['analytics']['term'][$unit];
-			$start_date = date('Y-m-d', strtotime("$n $unit ago"));
-			$end_date = date('Y-m-d');
-			$start_index = 1;
-			$max_resluts = 1000;
-			$ga->requestReportData($accounts['analytics']['profile_id'], 'pagePath', 'pageviews', '-pageviews', null, $start_date, $end_date, $start_index, $max_resluts);
-			foreach($ga->getResults() as $result) {
-				$report[(string) $result] = $result->getPageviews();
+
+			$token = $accounts['analytics']['token'];
+			$profile_id = $accounts['analytics']['profile_id'];
+			$refresh_token = $token->refresh_token;
+
+			/* Refresh Token */
+			$url = 'https://accounts.google.com/o/oauth2/token';
+			$parameter = array(
+				'refresh_token'		=> $refresh_token,
+				'client_id'			=> RANKS_GOOGLE_API_ID,
+				'client_secret'		=> RANKS_GOOGLE_API_SECRET,
+				'grant_type'		=> 'refresh_token',
+			);
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $parameter);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$responce = curl_exec($ch);
+			curl_close($ch);
+
+			$token = json_decode($responce);
+			$token->refresh_token = $refresh_token;
+
+			$accounts['analytics']['token'] = $token;
+			update_option('ranks_accounts', $accounts);
+
+			/* Get Data */
+			$url = 'https://www.googleapis.com/analytics/v3/data/ga';
+			$parameter = array(
+				'ids' => 'ga:'.$profile_id,
+				'start-date' => date_i18n('Y-m-d', strtotime("$n $unit ago")),
+				'end-date' => date_i18n('Y-m-d'),
+				'metrics' => 'ga:pageviews',
+				'dimensions' => 'ga:pagePath',
+				'max-results' => '1000',
+				'sort' => '-ga:pageviews',
+				'fields' => 'rows',
+				'key' => RANKS_GOOGLE_API_ID,
+			);
+			$url.='?'.http_build_query($parameter);
+
+			$header = array(
+				'Authorization: '.$token->token_type.' '.$token->access_token
+			);
+
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$responce = curl_exec($ch);
+			curl_close($ch);
+
+			$data = json_decode($responce);
+
+			foreach ($data->rows as $row) {
+				list($pagepath, $pageview) = $row;
+				$report[$pagepath] = intval($pageview);
 			}
 		}
 
 		$url = parse_url(get_permalink($post_id));
 		$pagepath = urldecode($url['path']);
-		return isset($report[$pagepath]) ? (int) $report[$pagepath] : 0;
+		return isset($report[$pagepath]) ? $report[$pagepath] : 0;
 	}
 
 	public function batch_facebook_like($posts) {

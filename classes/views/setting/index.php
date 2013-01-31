@@ -97,8 +97,7 @@
 <?php if (isset($account['profile_id'])) : ?>
 					<dt><span>プロファイル</span></dt>
 					<dd>
-						<?php echo $account['profile_name'] ? $account['profile_name'] : '未設定'; ?>
-						<span class="description">(<?php echo $account['profile_id'] ? $account['profile_id'] : ''; ?>)</span>
+						<?php echo $account['profile_id'] ? 'ga:'.$account['profile_id'] : ''; ?>
 					</dd>
 <?php endif; ?>
 <?php if (isset($account['term'])) : ?>
