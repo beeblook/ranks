@@ -449,6 +449,9 @@ class Ranks {
 			$accounts['analytics']['token'] = $token;
 			update_option('ranks_accounts', $accounts);
 
+			$unit = array_shift(array_keys($accounts['analytics']['term']));
+			$n = $accounts['analytics']['term'][$unit];
+
 			/* Get Data */
 			$url = 'https://www.googleapis.com/analytics/v3/data/ga';
 			$parameter = array(
