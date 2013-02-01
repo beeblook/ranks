@@ -8,29 +8,6 @@ class RanksSettingController extends RanksController {
 	public $menu_title = 'Ranks';
 	public $capability = 'edit_posts';
 
-	public $patterns = array();
-
-	public $accounts = array(
-		'analytics' => array(
-			'label' => 'Analytics',
-			'status' => false,
-			'auth_token' => null,
-			'profile_id' => null,
-			'profile_name' => null,
-			'term' => array('month'=>1),
-			'start_date' => null,
-			'end_date' => null,
-		),
-		'facebook' => array(
-			'label' => 'Facebook',
-			'status' => false,
-		),
-		'twitter' => array(
-			'label' => 'Twitter',
-			'status' => false,
-		),
-	);
-
 	public $terms = array(
 		'year' => '%s年間',
 		'month' => '%sヶ月',
@@ -41,8 +18,8 @@ class RanksSettingController extends RanksController {
 	public function index() {
 
 		$terms = $this->terms;
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 		$analytics_profile = get_option('ranks_analytics_profile_name', false);
 
 		$sort = array('schedule'=>array(), 'log'=>array());
@@ -91,8 +68,8 @@ class RanksSettingController extends RanksController {
 
 	public function target_new() {
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$terms = $this->terms;
 
@@ -140,8 +117,8 @@ class RanksSettingController extends RanksController {
 
 	public function target_edit() {
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$key = $_GET['key'];
 
@@ -195,10 +172,9 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function target_preview() {
-		global $ranks;
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$key = $_GET['key'];
 
@@ -208,7 +184,7 @@ class RanksSettingController extends RanksController {
 		}
 
 		query_posts(array(
-			$ranks->query_var => $key,
+			$this->ranks->query_var => $key,
 		));
 
 
@@ -218,7 +194,6 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function target_score(){
-		global $ranks;
 
 		$patterns = get_option('ranks_patterns', array());
 
@@ -232,7 +207,7 @@ class RanksSettingController extends RanksController {
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
 
-		$ranks->pattern_score($key);
+		$this->ranks->pattern_score($key);
 
 		wp_redirect($this->url('index'));
 		exit;
@@ -241,7 +216,7 @@ class RanksSettingController extends RanksController {
 	public function account_analytics() {
 
 		$terms = $this->terms;
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
 
 		$message = 0;
 		$selection = array();
@@ -372,7 +347,7 @@ class RanksSettingController extends RanksController {
 
 	public function account_facebook() {
 
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
 
 		if (!empty($_POST)) {
 
@@ -396,7 +371,7 @@ class RanksSettingController extends RanksController {
 
 	public function account_twitter() {
 
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
 
 		if (!empty($_POST)) {
 
@@ -420,8 +395,8 @@ class RanksSettingController extends RanksController {
 
 	public function account_preview() {
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$account_slug = $_GET['account'];
 
@@ -456,9 +431,8 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function account_count() {
-		global $ranks;
 
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
 
 		$account_slug = $_GET['account'];
 		if (!isset($accounts[$account_slug])) {
@@ -470,7 +444,7 @@ class RanksSettingController extends RanksController {
 		set_time_limit(-1);
 
 		$timestamp = current_time('timestamp');
-		$ranks->account_count($account_slug);
+		$this->ranks->account_count($account_slug);
 		$processing_time = current_time('timestamp') - $timestamp;
 		$method = 'manual';
 		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));

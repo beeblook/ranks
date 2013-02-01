@@ -183,7 +183,9 @@ input.ranks-remove-button:hover {
  * 	Ranks Datalist
  */
 .ranks-datalist {
-	margin: 10px;
+	margin: 0;
+	width: 350px;
+	float: left;
 }
 .ranks-datalist dt {
 	position: relative;
@@ -268,6 +270,14 @@ input.ranks-remove-button:hover {
 }
 .ranks-box.invalid {
 	color: #C0C0C0;
+}
+.ranks-box-columns {
+	padding: 10px;
+}
+.ranks-box-columns:after {
+	content: '';
+	display: block;
+	clear: both;
 }
 .ranks-box-label {
 	padding: 5px 10px;

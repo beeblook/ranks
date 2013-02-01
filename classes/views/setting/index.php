@@ -13,65 +13,71 @@
 <?php foreach ($patterns as $pattern_key => $pattern) : ?>
 			<div class="ranks-box">
 				<div class="ranks-box-label"><?php echo $pattern['label']; ?></div>
-				<dl class="ranks-datalist">
-					<dt><span>パターンキー</span></dt>
-					<dd><?php echo $pattern_key; ?></dd>
-					<dt><span>レート</span></dt>
-					<dd>
+				<div class="ranks-box-columns">
+					<dl class="ranks-datalist">
+						<dt><span>パターンキー</span></dt>
+						<dd><?php echo $pattern_key; ?></dd>
+						<dt><span>レート</span></dt>
+						<dd>
 <?php foreach($pattern['rates'] as $account_slug => $rate) : if ($rate == 0 || !isset($accounts[$account_slug]) || !$accounts[$account_slug]['status']) continue; ?>
-						<div class="ranks-rates-input <?php echo $account_slug; ?>">
-							<span class="ranks-rates-label"><?php echo $accounts[$account_slug]['label']; ?></span>
-							× <?php echo $rate; ?>
-						</div>
+							<div class="ranks-rates-input <?php echo $account_slug; ?>">
+								<span class="ranks-rates-label"><?php echo $accounts[$account_slug]['label']; ?></span>
+								× <?php echo $rate; ?>
+							</div>
 <?php endforeach; ?>
-					</dd>
-					<dt><span>投稿タイプ</span></dt>
-					<dd><?php
-						$types = array();
-						foreach ($pattern['post_type'] as $post_type) {
-							$post_type_object = get_post_type_object($post_type);
-							$types[] = $post_type_object->label . ' <span class="description">(' . $post_type_object->name . ')</span>';
-						}
-						echo join('<br>', $types);
-					?></dd>
-					<dt><span>表示件数</span></dt>
-					<dd><?php echo number_format_i18n($pattern['posts_per_page']); ?>位まで表示</dd>
-					<dt><span>集計期間</span></dt>
-					<dd><?php
-						$unit = array_shift(array_keys($pattern['term']));
-						$n = $pattern['term'][$unit];
-						echo sprintf($terms[$unit], $n) . ' <span class="description">(' . date('Y年n月j日', strtotime("$n $unit ago")) . ' から ' . date('Y年n月j日') . ')</span>';
-					?></dd>
-					<dt><span>自動集計</span></dt>
-					<dd><?php
-						if (empty($pattern['schedule_event'])) {
-							echo '<span class="description">(使用しない)</span>';
-						} else {
-							switch ($pattern['schedule_event']['type']) {
-								case 'daily':
-									echo '毎日 ';
-									break;
-								case 'weekly':
-									echo '毎週 ' . $wp_locale->get_weekday($pattern['schedule_event']['week']);
-									break;
-								case 'monthly':
-									echo '毎月 ' .  $pattern['schedule_event']['day'] . '日';
-									break;
+						</dd>
+					</dl>
+					<dl class="ranks-datalist">
+						<dt><span>投稿タイプ</span></dt>
+						<dd><?php
+							$types = array();
+							foreach ($pattern['post_type'] as $post_type) {
+								$post_type_object = get_post_type_object($post_type);
+								$types[] = $post_type_object->label . ' <span class="description">(' . $post_type_object->name . ')</span>';
 							}
-							echo ' ' . $pattern['schedule_event']['hour'] . '時に実行';
-							echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
-						}
-					?></dd>
-					<dt><span>ランキングページ</span></dt>
-					<dd><?php
-						if (empty($pattern['rewrite_rule'])) {
-							echo '<span class="description">(使用しない)</span>';
-						} else {
-							$url = home_url($pattern['rewrite_rule']);
-							echo '<a href="' . $url . '" target="_blank">' . $url . '</a>';
-						}
-					?></dd>
-				</dl>
+							echo join('<br>', $types);
+						?></dd>
+	<!--
+						<dt><span>表示件数</span></dt>
+						<dd><?php echo number_format_i18n($pattern['posts_per_page']); ?>位まで表示</dd>
+	 					<dt><span>集計期間</span></dt>
+						<dd><?php
+							$unit = array_shift(array_keys($pattern['term']));
+							$n = $pattern['term'][$unit];
+							echo sprintf($terms[$unit], $n) . ' <span class="description">(' . date('Y年n月j日', strtotime("$n $unit ago")) . ' から ' . date('Y年n月j日') . ')</span>';
+						?></dd>
+						<dt><span>自動集計</span></dt>
+						<dd><?php
+							if (empty($pattern['schedule_event'])) {
+								echo '<span class="description">(使用しない)</span>';
+							} else {
+								switch ($pattern['schedule_event']['type']) {
+									case 'daily':
+										echo '毎日 ';
+										break;
+									case 'weekly':
+										echo '毎週 ' . $wp_locale->get_weekday($pattern['schedule_event']['week']);
+										break;
+									case 'monthly':
+										echo '毎月 ' .  $pattern['schedule_event']['day'] . '日';
+										break;
+								}
+								echo ' ' . $pattern['schedule_event']['hour'] . '時に実行';
+								echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
+							}
+						?></dd>
+						<dt><span>ランキングページ</span></dt>
+						<dd><?php
+							if (empty($pattern['rewrite_rule'])) {
+								echo '<span class="description">(使用しない)</span>';
+							} else {
+								$url = home_url($pattern['rewrite_rule']);
+								echo '<a href="' . $url . '" target="_blank">' . $url . '</a>';
+							}
+						?></dd>
+	 -->
+					</dl>
+				</div>
 				<div class="ranks-action">
 					<a href="<?php echo $this->url('target_score', array('key'=>$pattern_key)); ?>" class="ranks-action-button">集計実行</a>
 					<a href="<?php echo $this->url('target_preview', array('key'=>$pattern_key)); ?>" class="ranks-action-button">ランキング確認</a>

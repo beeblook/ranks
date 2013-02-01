@@ -32,6 +32,10 @@ function get_ranks_patterns($key = null) {
 	global $ranks;
 	return $ranks->get_ranks_patterns($key);
 }
+function register_ranks_patterns($key, $args) {
+	global $ranks;
+	return $ranks->register_ranks_patterns($key, $args);
+}
 
 function get_ranks_label($key = null) {
 	global $ranks;
@@ -71,6 +75,8 @@ class Ranks {
 	public $menu_slug = 'ranks';
 	public $template = 'ranks';
 
+	private $filter_patterns = array();
+
 	public function __construct() {
 		require_once RANKS_DIR . '/core/controller.php';
 		require_once RANKS_DIR . '/core/view.php';
@@ -98,7 +104,7 @@ class Ranks {
 		if (!isset($wp_query->query_vars[$this->query_var])) return;
 
 		$key = $wp_query->query_vars[$this->query_var];
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		if (!isset($patterns[$key])) return;
 
 		$wp_query->query_vars['post_type'] = $patterns[$key]['post_type'];
@@ -149,7 +155,7 @@ class Ranks {
 		$class_name = __CLASS__ . join('', array_map('ucfirst', explode('_', $controller))) . 'Controller';
 		if (!class_exists($class_name) || !is_subclass_of($class_name, 'RanksController')) return false;
 
-		$object = new $class_name($controller);
+		$object = new $class_name($controller, $this);
 		$menu_slug = strtolower(__CLASS__) . '-' . $controller;
 		$hook = add_options_page( $object->page_title, $object->menu_title, $object->capability, $menu_slug, array($object, '_view'));
 		add_action("load-{$hook}", array($object, '_load'));
@@ -162,7 +168,7 @@ class Ranks {
 	 */
 
 	public function get_use_post_types() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		$post_type = array();
 		foreach ($patterns as $pattern) {
 			$post_type = array_merge($post_type, $pattern['post_type']);
@@ -171,15 +177,26 @@ class Ranks {
 	}
 
 	public function get_ranks_patterns() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		return $patterns;
 	}
 
 	public function get_ranks_pattern($key = null) {
 		if (is_null($key)) $key = get_query_var($this->query_var);
 		if (!$key) return false;
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		return isset($patterns[$key]) ? $patterns[$key] : null;
+	}
+
+	public function register_ranks_patterns($key, $args) {
+		$defaults = array();
+		$this->filter_patterns[$key] = wp_parse_args($args, $defaults);
+		$callback = array($this, 'filter_patterns');
+		if (!has_filter('ranks_patterns', $callback)) add_filter('ranks_patterns', $callback);
+	}
+
+	public function filter_patterns($patterns) {
+		return array_merge($this->filter_patterns, $patterns);
 	}
 
 	public function get_ranks_label($key = null) {
@@ -246,7 +263,7 @@ class Ranks {
 	 * Rewrite Rule
 	 */
 	public function rewrite_rule() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		if (empty($patterns)) return;
 		foreach (array_keys($patterns) as $key) {
 			if (!$patterns[$key]['rewrite_rule']) continue;
@@ -260,7 +277,7 @@ class Ranks {
 	 */
 
 	public function schedule() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		if (empty($patterns)) return;
 		foreach (array_keys($patterns) as $key) {
 			if (empty($patterns[$key]['schedule_event'])) continue;
@@ -329,11 +346,39 @@ class Ranks {
 	 * Account Logic
 	 */
 
+	public function get_accounts() {
+		$accounts = wp_cache_get(__FUNCTION__, __CLASS__);
+		if (!$accounts) {
+			$accounts = get_option('ranks_accounts', array(
+				'analytics' => array(
+					'label' => 'Analytics',
+					'status' => false,
+					'auth_token' => null,
+					'profile_id' => null,
+					'profile_name' => null,
+					'term' => array('month'=>1),
+					'start_date' => null,
+					'end_date' => null,
+				),
+				'facebook' => array(
+					'label' => 'Facebook',
+					'status' => false,
+				),
+				'twitter' => array(
+					'label' => 'Twitter',
+					'status' => false,
+				),
+			));
+			wp_cache_set(__FUNCTION__, $accounts, __CLASS__);
+		}
+		return apply_filters('ranks_accounts', $accounts);
+	}
+
 	public function account_count($target_account = array(), $method = 'manual') {
 
 		if (!is_array($target_account)) $target_account = array($target_account);
 
-		$accounts = get_option('ranks_accounts', array());
+		$accounts = $this->get_accounts();
 
 		$count_accounts = array();
 		foreach ($accounts as $account_slug => $account) {
@@ -422,7 +467,7 @@ class Ranks {
 		static $report;
 
 		if(is_null($report)){
-			$accounts = get_option('ranks_accounts', array());
+			$accounts = $this->get_accounts();
 
 			$token = $accounts['analytics']['token'];
 			$profile_id = $accounts['analytics']['profile_id'];
@@ -543,10 +588,19 @@ class Ranks {
 	 * Pattern Logic
 	 */
 
+	public function get_patterns() {
+		$patterns = wp_cache_get(__FUNCTION__, __CLASS__);
+		if (!$patterns) {
+			$patterns = get_option('ranks_patterns', array());
+			wp_cache_set(__FUNCTION__, $patterns, __CLASS__);
+		}
+		return apply_filters('ranks_patterns', $patterns);
+	}
+
 	public function pattern_score($key, $method = 'manual'){
 
-		$patterns = get_option('ranks_patterns', array());
-		$accounts = get_option('ranks_accounts', array());
+		$patterns = $this->get_patterns();
+		$accounts = $this->get_accounts();
 
 		// 指定のパターンがなければ失敗
 		if (!isset($patterns[$key])) return false;
