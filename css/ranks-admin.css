@@ -180,19 +180,56 @@ input.ranks-remove-button:hover {
 }
 
 /**
+ * 	Ranks Header
+ */
+.ranks-header {
+	margin: 0 0 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #DEDEDE;
+	font-size: 16px;
+	font-family: monospace;
+	font-weight: bold;
+}
+.ranks-header span {
+
+}
+
+/**
+ * 	Ranks Rate Data
+ */
+.ranks-ratedata {
+	width: 30%;
+	float: left;
+}
+
+/**
+ * 	Ranks PostType Data
+ */
+.ranks-posttypedata {
+	margin: 3px 0 0 0;
+	width: 30%;
+	float: left;
+}
+
+/**
  * 	Ranks Datalist
  */
 .ranks-datalist {
-	margin: 0;
-	width: 350px;
+	margin: 6px 0 0 0;
+	width: 40%;
 	float: left;
 }
 .ranks-datalist dt {
+	clear: left;
+	float: left;
+	margin-right: 1em;
+	width: 30%;
 	position: relative;
-	margin-bottom: 19px;
-	height: 9px;
-	border-bottom: 1px solid #E9E9E9;
+	margin-bottom: 10px;
+	height: 7px;
+	border-bottom: 1px dotted #C1C1C1;
 	font-weight: bold;
+	font-size: 10px;
 }
 .ranks-datalist dt span {
 	display: inline-block;
@@ -200,7 +237,12 @@ input.ranks-remove-button:hover {
 	background: #FFFFFF;
 }
 .ranks-datalist dd {
-	margin: 0 0 15px 0;
+	float: left;
+	margin: 0 0 6px 0;
+	font-size: 12px;
+}
+.ranks-datalist dd.rates {
+
 }
 
 /**
