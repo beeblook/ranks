@@ -195,7 +195,7 @@ class RanksSettingController extends RanksController {
 
 	public function target_score(){
 
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->ranks->get_patterns();
 
 		$key = $_GET['key'];
 
@@ -447,6 +447,8 @@ class RanksSettingController extends RanksController {
 		$this->ranks->account_count($account_slug);
 		$processing_time = current_time('timestamp') - $timestamp;
 		$method = 'manual';
+
+		if (empty($accounts[$account_slug]['log'])) $accounts[$account_slug]['log'] = array();
 		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
 
 		wp_redirect($this->url('index'));
