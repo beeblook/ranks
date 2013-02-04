@@ -59,7 +59,7 @@
 									break;
 							}
 							echo ' ' . $pattern['schedule_event']['hour'] . '時に実行';
-							echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
+							// echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
 						?></dd>
 <?php endif; ?>
 <?php if (!empty($pattern['rewrite_rule'])) : ?>

@@ -314,12 +314,14 @@ class RanksSettingController extends RanksController {
 				$profiles = json_decode($responce);
 
 				$selection = array();
-				foreach ($profiles->items as $item) {
-					$selection[$item->id] = array(
-						'profile_name' => $item->name,
-						'property_id' => $item->webPropertyId,
-						'website_url' => $item->websiteUrl,
-					);
+				if (!empty($profiles->items)) {
+					foreach ($profiles->items as $item) {
+						$selection[$item->id] = array(
+							'profile_name' => $item->name,
+							'property_id' => $item->webPropertyId,
+							'website_url' => $item->websiteUrl,
+						);
+					}
 				}
 
 				if (isset($accounts['analytics']['profile_id'])) {
