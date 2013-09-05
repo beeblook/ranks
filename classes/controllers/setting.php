@@ -226,11 +226,30 @@ class RanksSettingController extends RanksController {
 		if (!empty($_POST)) {
 
 			if (isset($_POST['clear'])) {
-
-				unset($accounts['analytics']);
+				$accounts['analytics'] = array(
+					'label' => 'Analytics',
+					'status' => false,
+					'auth_token' => null,
+					'profile_id' => null,
+					'profile_name' => null,
+					'term' => array('month'=>1),
+					'start_date' => null,
+					'end_date' => null,
+				);
 				update_option('ranks_accounts', $accounts);
 				$message = 9;
-
+			} if ( !isset($accounts['analytics']['app_id'] ) || !isset($accounts['analytics']['app_secret'] ) ) {
+				if( isset($_POST['app_id'] ) && isset( $_POST['app_secret'] ) ){
+					if( empty($_POST['app_id'] ) || empty( $_POST['app_secret'] ) ){
+						$message = 10;
+					}
+					else{
+						$accounts['analytics']['app_id'] = $_POST['app_id'];
+						$accounts['analytics']['app_secret'] = $_POST['app_secret'];
+						update_option('ranks_accounts', $accounts);
+						$message = 11;
+					}
+				}
 			} elseif (isset($_POST['profile_id']) && isset($accounts['analytics']['token'])) {
 
 				$profile_id = $_POST['profile_id'];
@@ -247,8 +266,8 @@ class RanksSettingController extends RanksController {
 				$url = 'https://accounts.google.com/o/oauth2/token';
 				$parameter = array(
 					'code'				=> $code,
-					'client_id'			=> RANKS_GOOGLE_API_ID,
-					'client_secret'		=> RANKS_GOOGLE_API_SECRET,
+					'client_id'			=> $accounts['analytics']['app_id'],
+					'client_secret'		=> $accounts['analytics']['app_secret'],
 					'grant_type'		=> 'authorization_code',
 					'redirect_uri'		=> 'urn:ietf:wg:oauth:2.0:oob',
 				);
@@ -289,15 +308,20 @@ class RanksSettingController extends RanksController {
 				case 2: $message = '<div class="ranks-message">本サイトのPVを取得できるプロファイルを選択して下さい。</div>'; break;
 				case 3: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
 				case 9: $message = '<div class="ranks-message">設定を削除しました。</div>'; break;
+				case 10: $message = '<div class="ranks-error">Google API Client ID と Client Secretは必須です。</div>'; break;
+				case 11: $message = '<div class="ranks-message">Google API Client設定を保存しました。</div>'; break;
 			}
 
-			if (isset($accounts['analytics']['token'])) {
+			if ( !isset($accounts['analytics']['app_id'] ) || !isset($accounts['analytics']['app_secret'] ) ) {
+				
+			}
+			else if (isset($accounts['analytics']['token'])) {
 
 				$token = $accounts['analytics']['token'];
 
 				$url = 'https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles';
 				$parameter = array(
-					'key' => RANKS_GOOGLE_API_ID,
+					'key' => $accounts['analytics']['app_id'],
 				);
 				$url.='?'.http_build_query($parameter);
 
@@ -334,7 +358,7 @@ class RanksSettingController extends RanksController {
 			$google_auth_url = 'https://accounts.google.com/o/oauth2/auth';
 			$parameter = array(
 				'response_type'		=> 'code',
-				'client_id'			=> RANKS_GOOGLE_API_ID,
+				'client_id'			=> $accounts['analytics']['app_id'],
 				'redirect_uri'		=> 'urn:ietf:wg:oauth:2.0:oob',
 				'scope'				=> 'https://www.googleapis.com/auth/analytics.readonly',
 				'state'				=> 'test',

@@ -48,6 +48,21 @@
 		<input class="button-primary" type="submit" name="submit" value="保存" />
 		<input class="ranks-remove-button" type="submit" name="clear" value="設定を削除" />
 	</p>
+<?php elseif ( !isset($accounts['analytics']['app_id'] ) || !isset($accounts['analytics']['app_secret'] ) ): ?>
+
+	<table class="form-table ranks-form-table">
+		<tr>
+			<th><strong>Client ID</strong></th>
+			<td><input type="text" name="app_id" value="<?php echo $accounts['analytics']['api_id'] ?>" /></td>
+		</tr>
+		<tr>
+			<th><strong>Client Secret</strong></th>
+			<td><input type="text" name="app_secret" value="<?php echo $accounts['analytics']['api_secret'] ?>" /></td>
+		</tr>
+	</table>
+	<p class="submit">
+		<input class="button-primary" type="submit" name="submit" value="保存" />
+	</p>
 
 <?php elseif (empty($selection)) : ?>
 
@@ -62,6 +77,7 @@
 	</table>
 	<p class="submit">
 		<input class="button-primary" type="submit" name="submit" value="認証コードを送信" />
+		<input class="ranks-remove-button" type="submit" name="clear" value="設定を削除" />
 	</p>
 
 <?php else : ?>

@@ -11,9 +11,6 @@ Version: 0.1.1
 define('RANKS_VER', '0.1.1');
 define('RANKS_DIR', dirname(__FILE__));
 
-define('RANKS_GOOGLE_API_ID', '245825365986-319dtcf5a896q5uab2egd62oisnr11nv.apps.googleusercontent.com');
-define('RANKS_GOOGLE_API_SECRET', 'S9vy61O54V6eBZwFliSB5uJZ');
-
 $ranks = new Ranks();
 
 function is_ranks($key = null) {
@@ -366,6 +363,7 @@ class Ranks {
 					'status' => false,
 				),
 			));
+			
 			wp_cache_set(__FUNCTION__, $accounts, __CLASS__);
 		}
 		return apply_filters('ranks_accounts', $accounts);
@@ -483,8 +481,8 @@ class Ranks {
 			$url = 'https://accounts.google.com/o/oauth2/token';
 			$parameter = array(
 				'refresh_token'		=> $refresh_token,
-				'client_id'			=> RANKS_GOOGLE_API_ID,
-				'client_secret'		=> RANKS_GOOGLE_API_SECRET,
+				'client_id'			=> $accounts['analytics']['app_id'],
+				'client_secret'		=> $accounts['analytics']['app_secret'],
 				'grant_type'		=> 'refresh_token',
 			);
 			$ch = curl_init($url);
@@ -514,7 +512,7 @@ class Ranks {
 				'max-results' => '1000',
 				'sort' => '-ga:pageviews',
 				'fields' => 'rows',
-				'key' => RANKS_GOOGLE_API_ID,
+				'key' => $accounts['analytics']['app_id'],
 			);
 			$url.='?'.http_build_query($parameter);
 
