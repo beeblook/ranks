@@ -13,7 +13,7 @@
 
 	<?php if ($message) echo $message; ?>
 
-<?php if (isset($accounts['analytics']['profile_id'])) : ?>
+<?php if ($profile) : ?>
 
 	<table class="form-table ranks-form-table">
 		<tr>
@@ -21,8 +21,12 @@
 			<td><label><input type="checkbox" name="enable" <?php checked($accounts['analytics']['status']); ?> /> 有効</label></td>
 		</tr>
 		<tr>
+			<th><strong>プロパティID</strong></th>
+			<td><span class="ranks-saved-value"><?php echo $profile['property_id']; ?></span></td>
+		</tr>
+		<tr>
 			<th><strong>プロファイル</strong></th>
-			<td><span class="ranks-saved-value"><?php echo $accounts['analytics']['profile_name']; ?></span></td>
+			<td><span class="ranks-saved-value"><?php echo $profile['profile_name']; ?></span></td>
 		</tr>
 		<tr>
 			<th><strong>プロファイルID</strong></th>
@@ -45,20 +49,19 @@
 		<input class="ranks-remove-button" type="submit" name="clear" value="設定を削除" />
 	</p>
 
-<?php elseif (empty($account_data)) : ?>
+<?php elseif (empty($selection)) : ?>
 
 	<table class="form-table ranks-form-table">
 		<tr>
-			<th><strong>メールアドレス</strong></th>
-			<td><input class="regular-text" type="email" name="mailaddress" /></td>
-		</tr>
-		<tr>
-			<th><strong>パスワード</strong></th>
-			<td><input class="regular-text" type="password" name="password" /></td>
+			<th><strong>認証コード</strong></th>
+			<td>
+				<input type="text" name="code" size="70" />
+				<a class="button" href="javascript:void(0);" onclick="window.open('<?php echo $google_auth_url; ?>', 'activate','width=700, height=600, menubar=0, status=0, location=0, toolbar=0');">認証コードを取得する</a>
+			</td>
 		</tr>
 	</table>
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="ログイン" />
+		<input class="button-primary" type="submit" name="submit" value="認証コードを送信" />
 	</p>
 
 <?php else : ?>
@@ -67,11 +70,16 @@
 		<tr>
 			<th><strong>プロファイル</strong></th>
 			<td>
-				<select id="profile_id" name="profile_id">
-<?php foreach ($account_data as $account) : ?>
-					<option value="<?php echo $account->getProfileId(); ?>"><?php echo $account->getProfileName(); ?></option>
+<?php foreach ($selection as $profile_id => $profile) : ?>
+				<div>
+					<label>
+						<input type="radio" name="profile_id" value="<?php echo $profile_id; ?>">
+						<span class="gray"><?php echo $profile['property_id']; ?></span>
+						<strong><?php echo $profile['profile_name']; ?></strong>
+						- <?php echo $profile['website_url']; ?>
+					</label>
+				</div>
 <?php endforeach; ?>
-				</select>
 			</td>
 		</tr>
 	</table>

@@ -14,6 +14,9 @@ define('RANKS_DIR', dirname(__FILE__));
 define('RANKS_FACEBOOK_APP_ID', '172810956175838');
 define('RANKS_FACEBOOK_APP_SECRET', '25ee6e8dc5ee0f03ccd8d3affc7d2da4');
 
+define('RANKS_GOOGLE_API_ID', '245825365986-319dtcf5a896q5uab2egd62oisnr11nv.apps.googleusercontent.com');
+define('RANKS_GOOGLE_API_SECRET', 'S9vy61O54V6eBZwFliSB5uJZ');
+
 $ranks = new Ranks();
 
 function is_ranks($key = null) {
@@ -28,6 +31,10 @@ function get_ranks($key = null) {
 function get_ranks_patterns($key = null) {
 	global $ranks;
 	return $ranks->get_ranks_patterns($key);
+}
+function register_ranks_patterns($key, $args) {
+	global $ranks;
+	return $ranks->register_ranks_patterns($key, $args);
 }
 
 function get_ranks_label($key = null) {
@@ -68,6 +75,8 @@ class Ranks {
 	public $menu_slug = 'ranks';
 	public $template = 'ranks';
 
+	private $filter_patterns = array();
+
 	public function __construct() {
 		require_once RANKS_DIR . '/core/controller.php';
 		require_once RANKS_DIR . '/core/view.php';
@@ -95,7 +104,7 @@ class Ranks {
 		if (!isset($wp_query->query_vars[$this->query_var])) return;
 
 		$key = $wp_query->query_vars[$this->query_var];
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		if (!isset($patterns[$key])) return;
 
 		$wp_query->query_vars['post_type'] = $patterns[$key]['post_type'];
@@ -146,7 +155,7 @@ class Ranks {
 		$class_name = __CLASS__ . join('', array_map('ucfirst', explode('_', $controller))) . 'Controller';
 		if (!class_exists($class_name) || !is_subclass_of($class_name, 'RanksController')) return false;
 
-		$object = new $class_name($controller);
+		$object = new $class_name($controller, $this);
 		$menu_slug = strtolower(__CLASS__) . '-' . $controller;
 		$hook = add_options_page( $object->page_title, $object->menu_title, $object->capability, $menu_slug, array($object, '_view'));
 		add_action("load-{$hook}", array($object, '_load'));
@@ -159,7 +168,7 @@ class Ranks {
 	 */
 
 	public function get_use_post_types() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		$post_type = array();
 		foreach ($patterns as $pattern) {
 			$post_type = array_merge($post_type, $pattern['post_type']);
@@ -168,15 +177,26 @@ class Ranks {
 	}
 
 	public function get_ranks_patterns() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		return $patterns;
 	}
 
 	public function get_ranks_pattern($key = null) {
 		if (is_null($key)) $key = get_query_var($this->query_var);
 		if (!$key) return false;
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		return isset($patterns[$key]) ? $patterns[$key] : null;
+	}
+
+	public function register_ranks_patterns($key, $args) {
+		$defaults = array();
+		$this->filter_patterns[$key] = wp_parse_args($args, $defaults);
+		$callback = array($this, 'filter_patterns');
+		if (!has_filter('ranks_patterns', $callback)) add_filter('ranks_patterns', $callback);
+	}
+
+	public function filter_patterns($patterns) {
+		return array_merge($this->filter_patterns, $patterns);
 	}
 
 	public function get_ranks_label($key = null) {
@@ -243,7 +263,7 @@ class Ranks {
 	 * Rewrite Rule
 	 */
 	public function rewrite_rule() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		if (empty($patterns)) return;
 		foreach (array_keys($patterns) as $key) {
 			if (!$patterns[$key]['rewrite_rule']) continue;
@@ -257,7 +277,7 @@ class Ranks {
 	 */
 
 	public function schedule() {
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->get_patterns();
 		if (empty($patterns)) return;
 		foreach (array_keys($patterns) as $key) {
 			if (empty($patterns[$key]['schedule_event'])) continue;
@@ -326,11 +346,39 @@ class Ranks {
 	 * Account Logic
 	 */
 
+	public function get_accounts() {
+		$accounts = wp_cache_get(__FUNCTION__, __CLASS__);
+		if (!$accounts) {
+			$accounts = get_option('ranks_accounts', array(
+				'analytics' => array(
+					'label' => 'Analytics',
+					'status' => false,
+					'auth_token' => null,
+					'profile_id' => null,
+					'profile_name' => null,
+					'term' => array('month'=>1),
+					'start_date' => null,
+					'end_date' => null,
+				),
+				'facebook' => array(
+					'label' => 'Facebook',
+					'status' => false,
+				),
+				'twitter' => array(
+					'label' => 'Twitter',
+					'status' => false,
+				),
+			));
+			wp_cache_set(__FUNCTION__, $accounts, __CLASS__);
+		}
+		return apply_filters('ranks_accounts', $accounts);
+	}
+
 	public function account_count($target_account = array(), $method = 'manual') {
 
 		if (!is_array($target_account)) $target_account = array($target_account);
 
-		$accounts = get_option('ranks_accounts', array());
+		$accounts = $this->get_accounts();
 
 		$count_accounts = array();
 		foreach ($accounts as $account_slug => $account) {
@@ -418,27 +466,73 @@ class Ranks {
 	public function get_analytics_pageview($post_id=null) {
 		static $report;
 
-		require_once RANKS_DIR . '/libraries/gapi.class.php';
-
 		if(is_null($report)){
-			$accounts = get_option('ranks_accounts', array());
-			if (!isset($accounts['analytics']['auth_token'])) return 0;
-			$ga = new gapi(null, null, $accounts['analytics']['auth_token']);
+			$accounts = $this->get_accounts();
+
+			$token = $accounts['analytics']['token'];
+			$profile_id = $accounts['analytics']['profile_id'];
+			$refresh_token = $token->refresh_token;
+
+			/* Refresh Token */
+			$url = 'https://accounts.google.com/o/oauth2/token';
+			$parameter = array(
+				'refresh_token'		=> $refresh_token,
+				'client_id'			=> RANKS_GOOGLE_API_ID,
+				'client_secret'		=> RANKS_GOOGLE_API_SECRET,
+				'grant_type'		=> 'refresh_token',
+			);
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $parameter);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$responce = curl_exec($ch);
+			curl_close($ch);
+
+			$token = json_decode($responce);
+			$token->refresh_token = $refresh_token;
+
+			$accounts['analytics']['token'] = $token;
+			update_option('ranks_accounts', $accounts);
+
 			$unit = array_shift(array_keys($accounts['analytics']['term']));
 			$n = $accounts['analytics']['term'][$unit];
-			$start_date = date('Y-m-d', strtotime("$n $unit ago"));
-			$end_date = date('Y-m-d');
-			$start_index = 1;
-			$max_resluts = 1000;
-			$ga->requestReportData($accounts['analytics']['profile_id'], 'pagePath', 'pageviews', '-pageviews', null, $start_date, $end_date, $start_index, $max_resluts);
-			foreach($ga->getResults() as $result) {
-				$report[(string) $result] = $result->getPageviews();
+
+			/* Get Data */
+			$url = 'https://www.googleapis.com/analytics/v3/data/ga';
+			$parameter = array(
+				'ids' => 'ga:'.$profile_id,
+				'start-date' => date_i18n('Y-m-d', strtotime("$n $unit ago")),
+				'end-date' => date_i18n('Y-m-d'),
+				'metrics' => 'ga:pageviews',
+				'dimensions' => 'ga:pagePath',
+				'max-results' => '1000',
+				'sort' => '-ga:pageviews',
+				'fields' => 'rows',
+				'key' => RANKS_GOOGLE_API_ID,
+			);
+			$url.='?'.http_build_query($parameter);
+
+			$header = array(
+				'Authorization: '.$token->token_type.' '.$token->access_token
+			);
+
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$responce = curl_exec($ch);
+			curl_close($ch);
+
+			$data = json_decode($responce);
+
+			foreach ($data->rows as $row) {
+				list($pagepath, $pageview) = $row;
+				$report[$pagepath] = intval($pageview);
 			}
 		}
 
 		$url = parse_url(get_permalink($post_id));
 		$pagepath = urldecode($url['path']);
-		return isset($report[$pagepath]) ? (int) $report[$pagepath] : 0;
+		return isset($report[$pagepath]) ? $report[$pagepath] : 0;
 	}
 
 	public function batch_facebook_like($posts) {
@@ -494,10 +588,19 @@ class Ranks {
 	 * Pattern Logic
 	 */
 
+	public function get_patterns() {
+		$patterns = wp_cache_get(__FUNCTION__, __CLASS__);
+		if (!$patterns) {
+			$patterns = get_option('ranks_patterns', array());
+			wp_cache_set(__FUNCTION__, $patterns, __CLASS__);
+		}
+		return apply_filters('ranks_patterns', $patterns);
+	}
+
 	public function pattern_score($key, $method = 'manual'){
 
-		$patterns = get_option('ranks_patterns', array());
-		$accounts = get_option('ranks_accounts', array());
+		$patterns = $this->get_patterns();
+		$accounts = $this->get_accounts();
 
 		// 指定のパターンがなければ失敗
 		if (!isset($patterns[$key])) return false;

@@ -8,29 +8,6 @@ class RanksSettingController extends RanksController {
 	public $menu_title = 'Ranks';
 	public $capability = 'edit_posts';
 
-	public $patterns = array();
-
-	public $accounts = array(
-		'analytics' => array(
-			'label' => 'Analytics',
-			'status' => false,
-			'auth_token' => null,
-			'profile_id' => null,
-			'profile_name' => null,
-			'term' => array('month'=>1),
-			'start_date' => null,
-			'end_date' => null,
-		),
-		'facebook' => array(
-			'label' => 'Facebook',
-			'status' => false,
-		),
-		'twitter' => array(
-			'label' => 'Twitter',
-			'status' => false,
-		),
-	);
-
 	public $terms = array(
 		'year' => '%s年間',
 		'month' => '%sヶ月',
@@ -41,12 +18,13 @@ class RanksSettingController extends RanksController {
 	public function index() {
 
 		$terms = $this->terms;
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 		$analytics_profile = get_option('ranks_analytics_profile_name', false);
 
 		$sort = array('schedule'=>array(), 'log'=>array());
 		$schedule = $logs = array();
+		
 		foreach ($patterns as $key => $pattern) {
 			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", compact('key'))) {
 				$timestamp = $next_schedule;
@@ -90,8 +68,8 @@ class RanksSettingController extends RanksController {
 
 	public function target_new() {
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$terms = $this->terms;
 
@@ -139,8 +117,8 @@ class RanksSettingController extends RanksController {
 
 	public function target_edit() {
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$key = $_GET['key'];
 
@@ -194,10 +172,9 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function target_preview() {
-		global $ranks;
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$key = $_GET['key'];
 
@@ -207,7 +184,7 @@ class RanksSettingController extends RanksController {
 		}
 
 		query_posts(array(
-			$ranks->query_var => $key,
+			$this->ranks->query_var => $key,
 		));
 
 
@@ -217,9 +194,8 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function target_score(){
-		global $ranks;
 
-		$patterns = get_option('ranks_patterns', array());
+		$patterns = $this->ranks->get_patterns();
 
 		$key = $_GET['key'];
 
@@ -231,7 +207,7 @@ class RanksSettingController extends RanksController {
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
 
-		$ranks->pattern_score($key);
+		$this->ranks->pattern_score($key);
 
 		wp_redirect($this->url('index'));
 		exit;
@@ -240,7 +216,12 @@ class RanksSettingController extends RanksController {
 	public function account_analytics() {
 
 		$terms = $this->terms;
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
+
+		$message = 0;
+		$selection = array();
+		$profile = null;
+		$google_auth_url = null;
 
 		if (!empty($_POST)) {
 
@@ -250,36 +231,42 @@ class RanksSettingController extends RanksController {
 				update_option('ranks_accounts', $accounts);
 				$message = 9;
 
-			} elseif (isset($_POST['profile_id'])) {
+			} elseif (isset($_POST['profile_id']) && isset($accounts['analytics']['token'])) {
 
 				$profile_id = $_POST['profile_id'];
 
-				$ga = new gapi(null, null, $accounts['analytics']['auth_token']);
-				$account_data = $ga->requestAccountData();
-				foreach ($account_data as $account) {
-					if ($account->getProfileId() == $profile_id) {
-						$profile_name = $account->getProfileName();
-						break;
-					}
-				}
-
 				$accounts['analytics']['status'] = true;
 				$accounts['analytics']['profile_id'] = $profile_id;
-				$accounts['analytics']['profile_name'] = $profile_name;
 				update_option('ranks_accounts', $accounts);
 				$message = 3;
 
-			} elseif (isset($_POST['mailaddress']) && isset($_POST['password'])) {
+			} elseif (isset($_POST['code'])) {
 
-				try {
-					$ga = new gapi($_POST['mailaddress'], $_POST['password']);
-					$auth_token = $ga->getAuthToken();
+				$code = $_POST['code'];
 
+				$url = 'https://accounts.google.com/o/oauth2/token';
+				$parameter = array(
+					'code'				=> $code,
+					'client_id'			=> RANKS_GOOGLE_API_ID,
+					'client_secret'		=> RANKS_GOOGLE_API_SECRET,
+					'grant_type'		=> 'authorization_code',
+					'redirect_uri'		=> 'urn:ietf:wg:oauth:2.0:oob',
+				);
+				$ch = curl_init($url);
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $parameter);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				$responce = curl_exec($ch);
+				curl_close($ch);
+
+				$token = json_decode($responce);
+
+				if (!isset($token->error)) {
 					$accounts['analytics']['status'] = false;
-					$accounts['analytics']['auth_token'] = $auth_token;
+					$accounts['analytics']['token'] = $token;
 					update_option('ranks_accounts', $accounts);
 					$message = 2;
-				} catch (Exception $e) {
+				} else {
 					$message = 1;
 				}
 
@@ -298,27 +285,71 @@ class RanksSettingController extends RanksController {
 		} else {
 
 			switch ($_GET['message']) {
-				case 1: $message = '<div class="ranks-error">メールアドレスまたはパスワードが正しくありません。</div>'; break;
+				case 1: $message = '<div class="ranks-error">認証コードが正しくありません。</div>'; break;
 				case 2: $message = '<div class="ranks-message">本サイトのPVを取得できるプロファイルを選択して下さい。</div>'; break;
 				case 3: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
 				case 9: $message = '<div class="ranks-message">設定を削除しました。</div>'; break;
 			}
 
-			if ($accounts['analytics']['auth_token'] && !isset($accounts['analytics']['profile_id'])) {
-				$ga = new gapi(null, null, $accounts['analytics']['auth_token']);
-				$account_data = $ga->requestAccountData();
-			} else {
-				$account_data = false;
+			if (isset($accounts['analytics']['token'])) {
+
+				$token = $accounts['analytics']['token'];
+
+				$url = 'https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles';
+				$parameter = array(
+					'key' => RANKS_GOOGLE_API_ID,
+				);
+				$url.='?'.http_build_query($parameter);
+
+				$header = array(
+					'Authorization: '.$token->token_type.' '.$token->access_token
+				);
+
+				$ch = curl_init($url);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				$responce = curl_exec($ch);
+				curl_close($ch);
+
+				$profiles = json_decode($responce);
+
+				$selection = array();
+				if (!empty($profiles->items)) {
+					foreach ($profiles->items as $item) {
+						$selection[$item->id] = array(
+							'profile_name' => $item->name,
+							'property_id' => $item->webPropertyId,
+							'website_url' => $item->websiteUrl,
+						);
+					}
+				}
+
+				if (isset($accounts['analytics']['profile_id'])) {
+					$profile_id = $accounts['analytics']['profile_id'];
+					$profile = isset($selection[$profile_id]) ? $selection[$profile_id] : null;
+				}
+
 			}
+
+			$google_auth_url = 'https://accounts.google.com/o/oauth2/auth';
+			$parameter = array(
+				'response_type'		=> 'code',
+				'client_id'			=> RANKS_GOOGLE_API_ID,
+				'redirect_uri'		=> 'urn:ietf:wg:oauth:2.0:oob',
+				'scope'				=> 'https://www.googleapis.com/auth/analytics.readonly',
+				'state'				=> 'test',
+				'approval_prompt'	=> 'auto',
+			);
+			$google_auth_url.='?'.http_build_query($parameter);
 
 		}
 
-		return compact('message', 'terms', 'accounts', 'account_data');
+		return compact('message', 'terms', 'accounts', 'selection', 'profile', 'google_auth_url');
 	}
 
 	public function account_facebook() {
 
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
 
 		if (!empty($_POST)) {
 
@@ -342,7 +373,7 @@ class RanksSettingController extends RanksController {
 
 	public function account_twitter() {
 
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
 
 		if (!empty($_POST)) {
 
@@ -366,8 +397,8 @@ class RanksSettingController extends RanksController {
 
 	public function account_preview() {
 
-		$patterns = array_merge($this->patterns, get_option('ranks_patterns', array()));
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$patterns = $this->ranks->get_patterns();
+		$accounts = $this->ranks->get_accounts();
 
 		$account_slug = $_GET['account'];
 
@@ -402,9 +433,8 @@ class RanksSettingController extends RanksController {
 	}
 
 	public function account_count() {
-		global $ranks;
 
-		$accounts = array_merge($this->accounts, get_option('ranks_accounts', array()));
+		$accounts = $this->ranks->get_accounts();
 
 		$account_slug = $_GET['account'];
 		if (!isset($accounts[$account_slug])) {
@@ -416,9 +446,11 @@ class RanksSettingController extends RanksController {
 		set_time_limit(-1);
 
 		$timestamp = current_time('timestamp');
-		$ranks->account_count($account_slug);
+		$this->ranks->account_count($account_slug);
 		$processing_time = current_time('timestamp') - $timestamp;
 		$method = 'manual';
+
+		if (empty($accounts[$account_slug]['log'])) $accounts[$account_slug]['log'] = array();
 		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
 
 		wp_redirect($this->url('index'));

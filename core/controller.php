@@ -2,6 +2,8 @@
 
 class RanksController {
 
+	public $ranks;
+
 	public $page_title;
 	public $menu_title;
 	public $capability;
@@ -10,8 +12,9 @@ class RanksController {
 	public $action;
 	public $attr = array();
 
-	public function __construct($controller) {
+	public function __construct($controller, $ranks) {
 		$this->controller = $controller;
+		$this->ranks = $ranks;
 	}
 
 	public function styles() {
