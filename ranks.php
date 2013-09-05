@@ -11,9 +11,6 @@ Version: 0.1.1
 define('RANKS_VER', '0.1.1');
 define('RANKS_DIR', dirname(__FILE__));
 
-define('RANKS_FACEBOOK_APP_ID', '172810956175838');
-define('RANKS_FACEBOOK_APP_SECRET', '25ee6e8dc5ee0f03ccd8d3affc7d2da4');
-
 define('RANKS_GOOGLE_API_ID', '245825365986-319dtcf5a896q5uab2egd62oisnr11nv.apps.googleusercontent.com');
 define('RANKS_GOOGLE_API_SECRET', 'S9vy61O54V6eBZwFliSB5uJZ');
 
@@ -388,7 +385,16 @@ class Ranks {
 
 			// ターゲット指定の場合、指定以外は除外
 			if ((!empty($target_account) && !in_array($account_slug, $target_account))) continue;
-
+			
+			// Facebook AppID & Secretが正しく設定されていない場合は除外
+			if( $account_slug == 'facebook' ){
+				if( isset( $accounts[ 'facebook' ][ 'app_id' ] ) && isset( $accounts[ 'facebook' ][ 'app_secret' ] ) ){
+					if( empty( $accounts[ 'facebook' ][ 'app_id' ] ) || empty( $accounts[ 'facebook' ][ 'app_secret' ] ) ){
+						continue;
+					}
+				}
+			}
+			
 			$count_accounts[$account_slug] = "ranks_{$account_slug}_count";
 
 		}
@@ -538,10 +544,12 @@ class Ranks {
 	public function batch_facebook_like($posts) {
 		static $access_token;
 		if (!$access_token) {
+			$accounts = $this->get_accounts();
+			
 			$url = 'https://graph.facebook.com/oauth/access_token';
 			$args = array(
-				'client_id' => RANKS_FACEBOOK_APP_ID,
-				'client_secret' => RANKS_FACEBOOK_APP_SECRET,
+				'client_id' => $accounts[ 'facebook' ][ 'app_id' ],
+				'client_secret' => $accounts[ 'facebook' ][ 'app_secret' ],
 				'grant_type' => 'client_credentials',
 			);
 			parse_str(file_get_contents(add_query_arg($args, $url)), $result);

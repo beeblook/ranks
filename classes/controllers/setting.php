@@ -353,7 +353,10 @@ class RanksSettingController extends RanksController {
 
 		if (!empty($_POST)) {
 
-			$accounts['facebook']['status'] = isset($_POST['enable']) && $_POST['enable'];
+			$accounts['facebook']['status']		= isset($_POST['enable']) && $_POST['enable'];
+			$accounts['facebook']['app_id']		= urlencode( $_POST['app_id'] );
+			$accounts['facebook']['app_secret']	= urlencode( $_POST['app_secret'] );
+			
 			update_option('ranks_accounts', $accounts);
 			$message = 1;
 
