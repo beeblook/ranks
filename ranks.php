@@ -327,7 +327,6 @@ class Ranks {
 
 	public function schedule_event($key) {
 		if (!$key) return;
-		update_option('ranks_debug_1', $key );
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
 		$pattern = $this->get_ranks_pattern($key);
