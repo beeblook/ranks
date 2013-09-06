@@ -278,7 +278,7 @@ class Ranks {
 			$schedule_hook = "ranks_schedule_{$key}";
 
 			// スケジュールが未設定の場合、次のスケジュールを設定する
-			if (!wp_next_scheduled($schedule_hook, compact('key'))) {
+			if (!wp_next_scheduled($schedule_hook, Array( $key ))) {
 
 				// タイムゾーン
 				$tz = get_option('timezone_string');
@@ -314,9 +314,9 @@ class Ranks {
 				};
 
 				if ($next_schedule) {
-					wp_schedule_single_event($next_schedule->format('U'), $schedule_hook, compact('key'));
+					wp_schedule_single_event($next_schedule->format('U'), $schedule_hook, Array( $key ) );
 					$patterns[$key]['next_schedule'] = $next_schedule->format('U');
-					update_option('ranks_patterns', $patterns);
+					$this->set_patterns( $patterns );
 				}
 			}
 
@@ -327,6 +327,7 @@ class Ranks {
 
 	public function schedule_event($key) {
 		if (!$key) return;
+		update_option('ranks_debug_1', $key );
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
 		$pattern = $this->get_ranks_pattern($key);
@@ -603,8 +604,13 @@ class Ranks {
 		return apply_filters('ranks_patterns', $patterns);
 	}
 
+	public function set_patterns( $patterns ) {
+		update_option('ranks_patterns', $patterns);
+		
+		wp_cache_set('get_patterns', $patterns, __CLASS__);
+	}
+	
 	public function pattern_score($key, $method = 'manual'){
-
 		$patterns = $this->get_patterns();
 		$accounts = $this->get_accounts();
 
@@ -660,14 +666,14 @@ class Ranks {
 		if (count($patterns[$key]['log']) > 10) {
 			$patterns[$key]['log'] = array_slice($patterns[$key]['log'], 0, 10);
 		}
-
+		
 		// ログファイル
 		if (is_writable(RANKS_DIR.'/schedule.log')) {
 			$log = date_i18n('[Y-m-d H:i:s T]') . ' ' . $key . ' (' . $processing_time . ' sec)';
 			file_put_contents(RANKS_DIR.'/schedule.log', $log.PHP_EOL, FILE_APPEND | LOCK_EX);
 		}
-
-		update_option('ranks_patterns', $patterns);
+		
+		$this->set_patterns( $patterns );
 	}
 
 	public function post_ago_where($where, $wp_query) {

@@ -26,7 +26,7 @@ class RanksSettingController extends RanksController {
 		$schedule = $logs = array();
 		
 		foreach ($patterns as $key => $pattern) {
-			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", compact('key'))) {
+			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", Array( $key ))) {
 				$timestamp = $next_schedule;
 				$pattern_label = $pattern['label'];
 				$account_label = array();
@@ -88,7 +88,8 @@ class RanksSettingController extends RanksController {
 				$patterns[$key]['post_type'] = $_POST['post_type'];
 				$patterns[$key]['term'] = array($_POST['term']['unit']=>$_POST['term']['n']);
 				$patterns[$key]['rates'] = array_map('floatval', $_POST['rates']);
-				update_option('ranks_patterns', $patterns);
+				
+				$this->ranks->set_patterns( $patterns );
 				$message = 1;
 
 			}
@@ -134,7 +135,7 @@ class RanksSettingController extends RanksController {
 			if (isset($_POST['clear'])) {
 
 				unset($patterns[$key]);
-				update_option('ranks_patterns', $patterns);
+				$this->ranks->set_patterns( $patterns );
 				wp_redirect($this->url('index'));
 				exit;
 
@@ -148,9 +149,9 @@ class RanksSettingController extends RanksController {
 				$patterns[$key]['rewrite_rule'] = isset($_POST['create_rewrite_rule']) && $_POST['create_rewrite_rule'] == 'create' ? $_POST['rewrite_rule'] : null;
 				$patterns[$key]['schedule_event'] = isset($_POST['enable_schedule_event']) && $_POST['enable_schedule_event'] == 'enable' ? $_POST['schedule_event'] : array();
 
-				wp_clear_scheduled_hook("ranks_schedule_{$key}", compact('key'));
+				wp_clear_scheduled_hook("ranks_schedule_{$key}", Array( $key ) );
 
-				update_option('ranks_patterns', $patterns);
+				$this->ranks->set_patterns( $patterns );
 				$message = 1;
 
 			}
@@ -472,13 +473,13 @@ class RanksSettingController extends RanksController {
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
 
-		$timestamp = current_time('timestamp');
+//		$timestamp = current_time('timestamp');
 		$this->ranks->account_count($account_slug);
-		$processing_time = current_time('timestamp') - $timestamp;
-		$method = 'manual';
-
-		if (empty($accounts[$account_slug]['log'])) $accounts[$account_slug]['log'] = array();
-		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
+//		$processing_time = current_time('timestamp') - $timestamp;
+//		$method = 'manual';
+//
+//		if (empty($accounts[$account_slug]['log'])) $accounts[$account_slug]['log'] = array();
+//		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
 
 		wp_redirect($this->url('index'));
 		exit;
