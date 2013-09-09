@@ -18,6 +18,14 @@
 			<th><strong>ステータス</strong></th>
 			<td><label><input type="checkbox" name="enable" <?php checked($accounts['facebook']['status']); ?> /> 有効</label></td>
 		</tr>
+		<tr>
+			<th><strong>App ID</strong></th>
+			<td><input type="text" name="app_id" value="<?php echo $accounts['facebook']['app_id'] ?>" /></td>
+		</tr>
+		<tr>
+			<th><strong>App Secret</strong></th>
+			<td><input type="text" name="app_secret" value="<?php echo $accounts['facebook']['app_secret'] ?>" /></td>
+		</tr>
 	</table>
 	<p class="submit">
 		<input class="button-primary" type="submit" name="submit" value="保存" />

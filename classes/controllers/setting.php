@@ -24,9 +24,9 @@ class RanksSettingController extends RanksController {
 
 		$sort = array('schedule'=>array(), 'log'=>array());
 		$schedule = $logs = array();
-
+		
 		foreach ($patterns as $key => $pattern) {
-			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", compact('key'))) {
+			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", Array( $key ))) {
 				$timestamp = $next_schedule;
 				$pattern_label = $pattern['label'];
 				$account_label = array();
@@ -88,7 +88,8 @@ class RanksSettingController extends RanksController {
 				$patterns[$key]['post_type'] = $_POST['post_type'];
 				$patterns[$key]['term'] = array($_POST['term']['unit']=>$_POST['term']['n']);
 				$patterns[$key]['rates'] = array_map('floatval', $_POST['rates']);
-				update_option('ranks_patterns', $patterns);
+				
+				$this->ranks->set_patterns( $patterns );
 				$message = 1;
 
 			}
@@ -134,7 +135,7 @@ class RanksSettingController extends RanksController {
 			if (isset($_POST['clear'])) {
 
 				unset($patterns[$key]);
-				update_option('ranks_patterns', $patterns);
+				$this->ranks->set_patterns( $patterns );
 				wp_redirect($this->url('index'));
 				exit;
 
@@ -148,9 +149,9 @@ class RanksSettingController extends RanksController {
 				$patterns[$key]['rewrite_rule'] = isset($_POST['create_rewrite_rule']) && $_POST['create_rewrite_rule'] == 'create' ? $_POST['rewrite_rule'] : null;
 				$patterns[$key]['schedule_event'] = isset($_POST['enable_schedule_event']) && $_POST['enable_schedule_event'] == 'enable' ? $_POST['schedule_event'] : array();
 
-				wp_clear_scheduled_hook("ranks_schedule_{$key}", compact('key'));
+				wp_clear_scheduled_hook("ranks_schedule_{$key}", Array( $key ) );
 
-				update_option('ranks_patterns', $patterns);
+				$this->ranks->set_patterns( $patterns );
 				$message = 1;
 
 			}
@@ -226,11 +227,30 @@ class RanksSettingController extends RanksController {
 		if (!empty($_POST)) {
 
 			if (isset($_POST['clear'])) {
-
-				unset($accounts['analytics']);
+				$accounts['analytics'] = array(
+					'label' => 'Analytics',
+					'status' => false,
+					'auth_token' => null,
+					'profile_id' => null,
+					'profile_name' => null,
+					'term' => array('month'=>1),
+					'start_date' => null,
+					'end_date' => null,
+				);
 				update_option('ranks_accounts', $accounts);
 				$message = 9;
-
+			} if ( !isset($accounts['analytics']['app_id'] ) || !isset($accounts['analytics']['app_secret'] ) ) {
+				if( isset($_POST['app_id'] ) && isset( $_POST['app_secret'] ) ){
+					if( empty($_POST['app_id'] ) || empty( $_POST['app_secret'] ) ){
+						$message = 10;
+					}
+					else{
+						$accounts['analytics']['app_id'] = $_POST['app_id'];
+						$accounts['analytics']['app_secret'] = $_POST['app_secret'];
+						update_option('ranks_accounts', $accounts);
+						$message = 11;
+					}
+				}
 			} elseif (isset($_POST['profile_id']) && isset($accounts['analytics']['token'])) {
 
 				$profile_id = $_POST['profile_id'];
@@ -247,8 +267,8 @@ class RanksSettingController extends RanksController {
 				$url = 'https://accounts.google.com/o/oauth2/token';
 				$parameter = array(
 					'code'				=> $code,
-					'client_id'			=> RANKS_GOOGLE_API_ID,
-					'client_secret'		=> RANKS_GOOGLE_API_SECRET,
+					'client_id'			=> $accounts['analytics']['app_id'],
+					'client_secret'		=> $accounts['analytics']['app_secret'],
 					'grant_type'		=> 'authorization_code',
 					'redirect_uri'		=> 'urn:ietf:wg:oauth:2.0:oob',
 				);
@@ -289,15 +309,20 @@ class RanksSettingController extends RanksController {
 				case 2: $message = '<div class="ranks-message">本サイトのPVを取得できるプロファイルを選択して下さい。</div>'; break;
 				case 3: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
 				case 9: $message = '<div class="ranks-message">設定を削除しました。</div>'; break;
+				case 10: $message = '<div class="ranks-error">Google API Client ID と Client Secretは必須です。</div>'; break;
+				case 11: $message = '<div class="ranks-message">Google API Client設定を保存しました。</div>'; break;
 			}
 
-			if (isset($accounts['analytics']['token'])) {
+			if ( !isset($accounts['analytics']['app_id'] ) || !isset($accounts['analytics']['app_secret'] ) ) {
+				
+			}
+			else if (isset($accounts['analytics']['token'])) {
 
 				$token = $accounts['analytics']['token'];
 
 				$url = 'https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles';
 				$parameter = array(
-					'key' => RANKS_GOOGLE_API_ID,
+					'key' => $accounts['analytics']['app_id'],
 				);
 				$url.='?'.http_build_query($parameter);
 
@@ -334,7 +359,7 @@ class RanksSettingController extends RanksController {
 			$google_auth_url = 'https://accounts.google.com/o/oauth2/auth';
 			$parameter = array(
 				'response_type'		=> 'code',
-				'client_id'			=> RANKS_GOOGLE_API_ID,
+				'client_id'			=> $accounts['analytics']['app_id'],
 				'redirect_uri'		=> 'urn:ietf:wg:oauth:2.0:oob',
 				'scope'				=> 'https://www.googleapis.com/auth/analytics.readonly',
 				'state'				=> 'test',
@@ -353,7 +378,10 @@ class RanksSettingController extends RanksController {
 
 		if (!empty($_POST)) {
 
-			$accounts['facebook']['status'] = isset($_POST['enable']) && $_POST['enable'];
+			$accounts['facebook']['status']		= isset($_POST['enable']) && $_POST['enable'];
+			$accounts['facebook']['app_id']		= urlencode( $_POST['app_id'] );
+			$accounts['facebook']['app_secret']	= urlencode( $_POST['app_secret'] );
+			
 			update_option('ranks_accounts', $accounts);
 			$message = 1;
 
@@ -445,13 +473,13 @@ class RanksSettingController extends RanksController {
 		ini_set('memory_limit', '256M');
 		set_time_limit(-1);
 
-		$timestamp = current_time('timestamp');
+//		$timestamp = current_time('timestamp');
 		$this->ranks->account_count($account_slug);
-		$processing_time = current_time('timestamp') - $timestamp;
-		$method = 'manual';
-
-		if (empty($accounts[$account_slug]['log'])) $accounts[$account_slug]['log'] = array();
-		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
+//		$processing_time = current_time('timestamp') - $timestamp;
+//		$method = 'manual';
+//
+//		if (empty($accounts[$account_slug]['log'])) $accounts[$account_slug]['log'] = array();
+//		array_unshift($accounts[$account_slug]['log'], compact('timestamp', 'processing_time', 'method'));
 
 		wp_redirect($this->url('index'));
 		exit;

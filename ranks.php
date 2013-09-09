@@ -11,12 +11,6 @@ Version: 0.1.1
 define('RANKS_VER', '0.1.1');
 define('RANKS_DIR', dirname(__FILE__));
 
-define('RANKS_FACEBOOK_APP_ID', '172810956175838');
-define('RANKS_FACEBOOK_APP_SECRET', '25ee6e8dc5ee0f03ccd8d3affc7d2da4');
-
-define('RANKS_GOOGLE_API_ID', '245825365986-319dtcf5a896q5uab2egd62oisnr11nv.apps.googleusercontent.com');
-define('RANKS_GOOGLE_API_SECRET', 'S9vy61O54V6eBZwFliSB5uJZ');
-
 $ranks = new Ranks();
 
 function is_ranks($key = null) {
@@ -284,7 +278,7 @@ class Ranks {
 			$schedule_hook = "ranks_schedule_{$key}";
 
 			// スケジュールが未設定の場合、次のスケジュールを設定する
-			if (!wp_next_scheduled($schedule_hook, compact('key'))) {
+			if (!wp_next_scheduled($schedule_hook, Array( $key ))) {
 
 				// タイムゾーン
 				$tz = get_option('timezone_string');
@@ -320,9 +314,9 @@ class Ranks {
 				};
 
 				if ($next_schedule) {
-					wp_schedule_single_event($next_schedule->format('U'), $schedule_hook, compact('key'));
+					wp_schedule_single_event($next_schedule->format('U'), $schedule_hook, Array( $key ) );
 					$patterns[$key]['next_schedule'] = $next_schedule->format('U');
-					update_option('ranks_patterns', $patterns);
+					$this->set_patterns( $patterns );
 				}
 			}
 
@@ -369,6 +363,7 @@ class Ranks {
 					'status' => false,
 				),
 			));
+			
 			wp_cache_set(__FUNCTION__, $accounts, __CLASS__);
 		}
 		return apply_filters('ranks_accounts', $accounts);
@@ -388,7 +383,16 @@ class Ranks {
 
 			// ターゲット指定の場合、指定以外は除外
 			if ((!empty($target_account) && !in_array($account_slug, $target_account))) continue;
-
+			
+			// Facebook AppID & Secretが正しく設定されていない場合は除外
+			if( $account_slug == 'facebook' ){
+				if( isset( $accounts[ 'facebook' ][ 'app_id' ] ) && isset( $accounts[ 'facebook' ][ 'app_secret' ] ) ){
+					if( empty( $accounts[ 'facebook' ][ 'app_id' ] ) || empty( $accounts[ 'facebook' ][ 'app_secret' ] ) ){
+						continue;
+					}
+				}
+			}
+			
 			$count_accounts[$account_slug] = "ranks_{$account_slug}_count";
 
 		}
@@ -477,8 +481,8 @@ class Ranks {
 			$url = 'https://accounts.google.com/o/oauth2/token';
 			$parameter = array(
 				'refresh_token'		=> $refresh_token,
-				'client_id'			=> RANKS_GOOGLE_API_ID,
-				'client_secret'		=> RANKS_GOOGLE_API_SECRET,
+				'client_id'			=> $accounts['analytics']['app_id'],
+				'client_secret'		=> $accounts['analytics']['app_secret'],
 				'grant_type'		=> 'refresh_token',
 			);
 			$ch = curl_init($url);
@@ -508,7 +512,7 @@ class Ranks {
 				'max-results' => '1000',
 				'sort' => '-ga:pageviews',
 				'fields' => 'rows',
-				'key' => RANKS_GOOGLE_API_ID,
+				'key' => $accounts['analytics']['app_id'],
 			);
 			$url.='?'.http_build_query($parameter);
 
@@ -538,10 +542,12 @@ class Ranks {
 	public function batch_facebook_like($posts) {
 		static $access_token;
 		if (!$access_token) {
+			$accounts = $this->get_accounts();
+			
 			$url = 'https://graph.facebook.com/oauth/access_token';
 			$args = array(
-				'client_id' => RANKS_FACEBOOK_APP_ID,
-				'client_secret' => RANKS_FACEBOOK_APP_SECRET,
+				'client_id' => $accounts[ 'facebook' ][ 'app_id' ],
+				'client_secret' => $accounts[ 'facebook' ][ 'app_secret' ],
 				'grant_type' => 'client_credentials',
 			);
 			parse_str(file_get_contents(add_query_arg($args, $url)), $result);
@@ -597,8 +603,13 @@ class Ranks {
 		return apply_filters('ranks_patterns', $patterns);
 	}
 
+	public function set_patterns( $patterns ) {
+		update_option('ranks_patterns', $patterns);
+		
+		wp_cache_set('get_patterns', $patterns, __CLASS__);
+	}
+	
 	public function pattern_score($key, $method = 'manual'){
-
 		$patterns = $this->get_patterns();
 		$accounts = $this->get_accounts();
 
@@ -654,14 +665,14 @@ class Ranks {
 		if (count($patterns[$key]['log']) > 10) {
 			$patterns[$key]['log'] = array_slice($patterns[$key]['log'], 0, 10);
 		}
-
+		
 		// ログファイル
 		if (is_writable(RANKS_DIR.'/schedule.log')) {
 			$log = date_i18n('[Y-m-d H:i:s T]') . ' ' . $key . ' (' . $processing_time . ' sec)';
 			file_put_contents(RANKS_DIR.'/schedule.log', $log.PHP_EOL, FILE_APPEND | LOCK_EX);
 		}
-
-		update_option('ranks_patterns', $patterns);
+		
+		$this->set_patterns( $patterns );
 	}
 
 	public function post_ago_where($where, $wp_query) {
