@@ -553,7 +553,11 @@ class Ranks {
 				'client_secret' => $accounts[ 'facebook' ][ 'app_secret' ],
 				'grant_type' => 'client_credentials',
 			);
-			parse_str(file_get_contents(add_query_arg($args, $url)), $result);
+			$ch = curl_init(add_query_arg($args, $url));
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$data = curl_exec($ch);
+			curl_close($ch);
+			parse_str($data, $result);
 			$access_token = $result['access_token'];
 		}
 		$likes = array();
