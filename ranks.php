@@ -123,6 +123,8 @@ class Ranks {
 
 		$templates[] = "{$this->template}-{$key}.php";
 		$templates[] = "{$this->template}.php";
+		$templates[] = "archive.php";
+		$templates[] = "index.php";
 
 		return get_query_template($this->template, $templates);
 	}
