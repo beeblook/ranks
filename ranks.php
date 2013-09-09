@@ -5,10 +5,10 @@ Plugin URI: http://www.colorchips.co.jp/
 Description: Analytics・Facebook・Twitterからランキングを作ります。
 Author: COLORCHIPS
 Author URI: http://www.colorchips.co.jp/
-Version: 1.0.0
+Version: 1.0.1
 */
 
-define('RANKS_VER', '1.0.0');
+define('RANKS_VER', '1.0.1');
 define('RANKS_DIR', dirname(__FILE__));
 define('RANKS_LOG', false);
 
