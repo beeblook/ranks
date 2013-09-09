@@ -1,15 +1,16 @@
 <?php
 /*
 Plugin Name: Ranks
-Plugin URI: http://
+Plugin URI: http://www.colorchips.co.jp/
 Description: Analytics・Facebook・Twitterからランキングを作ります。
-Author: colorchips
+Author: COLORCHIPS
 Author URI: http://www.colorchips.co.jp/
-Version: 0.1.1
+Version: 1.0.0
 */
 
-define('RANKS_VER', '0.1.1');
+define('RANKS_VER', '1.0.0');
 define('RANKS_DIR', dirname(__FILE__));
+define('RANKS_LOG', false);
 
 $ranks = new Ranks();
 
@@ -106,9 +107,9 @@ class Ranks {
 		$wp_query->query_vars['orderby'] = 'meta_value_num';
 		$wp_query->query_vars['order'] = 'desc';
 
-		if (!isset($wp_query->query_vars['posts_per_page'])) {
-			$wp_query->query_vars['posts_per_page'] = $patterns[$key]['posts_per_page'];
-		}
+		// if (!isset($wp_query->query_vars['posts_per_page'])) {
+		// 	$wp_query->query_vars['posts_per_page'] = $patterns[$key]['posts_per_page'];
+		// }
 
 		$wp_query->is_home = false;
 		$wp_query->is_archive = true;
@@ -445,7 +446,7 @@ class Ranks {
 				}
 
 				// ログファイル
-				if (is_writable(RANKS_DIR.'/schedule.log')) {
+				if (defined('RANKS_LOG') && RANKS_LOG && is_writable(RANKS_DIR.'/schedule.log')) {
 					$log = date_i18n('[Y-m-d H:i:s T]') . ' ' . $account_slug . ' (' . $processing_time . ' sec)';
 					file_put_contents(RANKS_DIR.'/schedule.log', $log.PHP_EOL, FILE_APPEND | LOCK_EX);
 				}
@@ -669,7 +670,7 @@ class Ranks {
 		}
 		
 		// ログファイル
-		if (is_writable(RANKS_DIR.'/schedule.log')) {
+		if (defined('RANKS_LOG') && RANKS_LOG && is_writable(RANKS_DIR.'/schedule.log')) {
 			$log = date_i18n('[Y-m-d H:i:s T]') . ' ' . $key . ' (' . $processing_time . ' sec)';
 			file_put_contents(RANKS_DIR.'/schedule.log', $log.PHP_EOL, FILE_APPEND | LOCK_EX);
 		}

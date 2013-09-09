@@ -143,7 +143,7 @@ class RanksSettingController extends RanksController {
 
 				$patterns[$key]['label'] = $_POST['label'];
 				$patterns[$key]['post_type'] = $_POST['post_type'];
-				$patterns[$key]['posts_per_page'] = intval($_POST['posts_per_page']);
+				// $patterns[$key]['posts_per_page'] = intval($_POST['posts_per_page']);
 				$patterns[$key]['term'] = array($_POST['term']['unit']=>$_POST['term']['n']);
 				$patterns[$key]['rates'] = array_map('floatval', $_POST['rates']);
 				$patterns[$key]['rewrite_rule'] = isset($_POST['create_rewrite_rule']) && $_POST['create_rewrite_rule'] == 'create' ? $_POST['rewrite_rule'] : null;

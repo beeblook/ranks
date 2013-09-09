@@ -36,9 +36,11 @@
 						?>
 					</div>
 					<dl class="ranks-datalist">
+<?php /*
 						<dt><span>表示件数</span></dt>
 						<dd><?php echo number_format_i18n($pattern['posts_per_page']); ?>位まで表示</dd>
-	 					<dt><span>集計期間</span></dt>
+*/ ?>
+						<dt><span>集計期間</span></dt>
 						<dd><?php
 							$unit = array_shift(array_keys($pattern['term']));
 							$n = $pattern['term'][$unit];

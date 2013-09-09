@@ -57,6 +57,7 @@
 <?php endforeach; ?>
 			</td>
 		</tr>
+<?php /*
 		<tr>
 			<th>
 				<strong>表示件数</strong><br>
@@ -68,6 +69,7 @@
 				<span class="description">同位の投稿が複数ある場合、最後の順位まで表示されない場合があります。</span>
 			</td>
 		</tr>
+*/ ?>
 		<tr>
 			<th>
 				<strong>集計期間</strong><br>
@@ -134,7 +136,8 @@
 				<label><input data-toggle="ranks-rewrite-rule" type="checkbox" name="create_rewrite_rule" value="create" <?php checked(!empty($pattern['rewrite_rule'])); ?> /> ランキングページを生成する</label><br>
 				<div id="ranks-rewrite-rule" class="ranks-toggle">
 					<label class="ranks-rewrite-rule-path"><?php echo home_url('/'); ?><input class="regular-text" type="text" name="rewrite_rule" value="<?php echo esc_attr($pattern['rewrite_rule']); ?>" size="10" /></label><br>
-					<span class="description">ランキングページは固定ページより優先して表示されます。</span>
+					<span class="description">ランキングページは固定ページより優先して表示されます。</span><br>
+					<span class="description">テンプレートファイルは<code>ranks-(キー).php</code>、<code>ranks.php</code>、<code>archive.php</code>、<code>index.php</code>が使用されます。</span>
 				</div>
 			</td>
 		</tr>
