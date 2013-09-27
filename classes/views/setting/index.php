@@ -6,7 +6,7 @@
 <table class="form-table ranks-form-table">
 	<tr>
 		<th>
-			<p><strong>集計パターン</strong></p>
+			<p><strong><?php _e('pattern','ranks');?></strong></p>
 			<p>ランキングに含める条件の設定</p>
 		</th>
 		<td>
@@ -51,13 +51,13 @@
 						<dd><?php
 							switch ($pattern['schedule_event']['type']) {
 								case 'daily':
-									echo '毎日 ';
+									echo __('daily','ranks');
 									break;
 								case 'weekly':
-									echo '毎週 ' . $wp_locale->get_weekday($pattern['schedule_event']['week']);
+									echo __('weekly','ranks') . $wp_locale->get_weekday($pattern['schedule_event']['week']);
 									break;
 								case 'monthly':
-									echo '毎月 ' .  $pattern['schedule_event']['day'] . '日';
+									echo __('monthly','ranks') .  $pattern['schedule_event']['day'] . '日';
 									break;
 							}
 							echo ' ' . $pattern['schedule_event']['hour'] . '時に実行';
@@ -80,12 +80,12 @@
 				</div>
 			</div>
 <?php endforeach; ?>
-			<a href="<?php echo $this->url('target_new'); ?>" class="ranks-box-link">集計パターン追加</a>
+			<a href="<?php echo $this->url('target_new'); ?>" class="ranks-box-link"><?php _e('Add Pattern','ranks');?></a>
 		</td>
 	</tr>
 	<tr>
 		<th>
-			<p><strong>データソース</strong></p>
+			<p><strong><?php _e('DataSource','ranks');?></strong></p>
 			<p>使用するソーシャルデータの設定</p>
 		</th>
 		<td>
@@ -94,7 +94,7 @@
 				<div class="ranks-box-label"><?php echo $account['label']; ?></div>
 				<div class="ranks-box-columns">
 					<dl class="ranks-datalist">
-						<dt><span>ステータス</span></dt>
+						<dt><span><?php _e('status','ranks');?></span></dt>
 						<dd><?php echo $account['status'] ? '有効' : '無効'; ?></dd>
 <?php if (isset($account['profile_id'])) : ?>
 						<dt><span>プロファイル</span></dt>

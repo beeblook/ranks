@@ -1,11 +1,13 @@
 <?php
-/*
+/**
 Plugin Name: Ranks
 Plugin URI: http://www.colorchips.co.jp/
-Description: Analytics・Facebook・Twitterからランキングを作ります。
+Description: Make Ranking From Google Analytics/Facebook/Twitter
 Author: COLORCHIPS
 Author URI: http://www.colorchips.co.jp/
 Version: 1.0.1
+Text Domain: ranks
+Domain Path: /languages
 */
 
 define('RANKS_VER', '1.0.1');
@@ -70,11 +72,17 @@ class Ranks {
 	public $menu_slug = 'ranks';
 	public $template = 'ranks';
 
+	private $textdomain = 'ranks';
+	private $lang_dir = 'languages';
+
 	private $filter_patterns = array();
 
 	public function __construct() {
 		require_once RANKS_DIR . '/core/controller.php';
 		require_once RANKS_DIR . '/core/view.php';
+
+    load_textdomain($this->textdomain, plugin_dir_path(__FILE__) . $this->lang_dir . '/' . $this->textdomain . '-' . get_locale() . '.mo');
+
 		add_action('init', array($this, 'init'));
 		add_action('admin_init', array($this, 'admin_init'));
 		add_action('admin_menu', array($this, 'admin_menu'));
@@ -366,7 +374,7 @@ class Ranks {
 					'status' => false,
 				),
 			));
-			
+
 			wp_cache_set(__FUNCTION__, $accounts, __CLASS__);
 		}
 		return apply_filters('ranks_accounts', $accounts);
@@ -386,7 +394,7 @@ class Ranks {
 
 			// ターゲット指定の場合、指定以外は除外
 			if ((!empty($target_account) && !in_array($account_slug, $target_account))) continue;
-			
+
 			// Facebook AppID & Secretが正しく設定されていない場合は除外
 			if( $account_slug == 'facebook' ){
 				if( isset( $accounts[ 'facebook' ][ 'app_id' ] ) && isset( $accounts[ 'facebook' ][ 'app_secret' ] ) ){
@@ -395,7 +403,7 @@ class Ranks {
 					}
 				}
 			}
-			
+
 			$count_accounts[$account_slug] = "ranks_{$account_slug}_count";
 
 		}
@@ -546,7 +554,7 @@ class Ranks {
 		static $access_token;
 		if (!$access_token) {
 			$accounts = $this->get_accounts();
-			
+
 			$url = 'https://graph.facebook.com/oauth/access_token';
 			$args = array(
 				'client_id' => $accounts[ 'facebook' ][ 'app_id' ],
@@ -612,10 +620,10 @@ class Ranks {
 
 	public function set_patterns( $patterns ) {
 		update_option('ranks_patterns', $patterns);
-		
+
 		wp_cache_set('get_patterns', $patterns, __CLASS__);
 	}
-	
+
 	public function pattern_score($key, $method = 'manual'){
 		$patterns = $this->get_patterns();
 		$accounts = $this->get_accounts();
@@ -672,13 +680,13 @@ class Ranks {
 		if (count($patterns[$key]['log']) > 10) {
 			$patterns[$key]['log'] = array_slice($patterns[$key]['log'], 0, 10);
 		}
-		
+
 		// ログファイル
 		if (defined('RANKS_LOG') && RANKS_LOG && is_writable(RANKS_DIR.'/schedule.log')) {
 			$log = date_i18n('[Y-m-d H:i:s T]') . ' ' . $key . ' (' . $processing_time . ' sec)';
 			file_put_contents(RANKS_DIR.'/schedule.log', $log.PHP_EOL, FILE_APPEND | LOCK_EX);
 		}
-		
+
 		$this->set_patterns( $patterns );
 	}
 

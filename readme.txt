@@ -8,25 +8,30 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-= データソースはアナリティクス =
+= Data source =
+* Use of the page view of Google Analytics is possible.
 
-ランキングの集計には Googleアナリティクスのページビューデータを使用します。 もし、すでにアナリティクスを導入していれば、Ranksを導入後すぐに人気のコンテンツが表示できます。
+If Analytics is already downloaded, popular contents can be displayed immediately after introducing Ranks.
+The page view data can be totaled in favorite periods, like "one week before."
 
-もちろん、取得するページビューデータは、「今日から1週間前」など、お好きな期間に設定できます。
+* The specification of the number of LIKE of facebook is possible.
+Need to setup [App ID] and [App Secret].
 
-= 全自動ランキング集計 =
+* Total the number by which the report was "tweet" by twitter.
+The ranking is created on coefficient set to above each report
 
-一度設定するだけで、指定した期間のランキングの自動的に集計することが可能です。
-例えば、月間ランキングなんて設定もカンタンです。
+= Full automatic ranking total =
+It is possible to total automatically [ the ranking of a period which is
+only set up once and was specified ].
+For example, easey to setup Monthly ranking
 
-集計期間
-    X日／X週／Xヶ月で指定可能
-集計時刻
-    0〜23時で設定可能
+time Customization
+It is the total time which can be specified in X day / X week / X months.
+A setup at 0:00 to 23:00 is possible.
 
-= カスタマイズ対応 =
-
-カスタム投稿タイプにも対応。カスタマイズされたWordPressコンテンツも集計できます。
+= Customization correspondence =
+It corresponds also to a custom poste type.
+The customized WordPress contents can also be totaled.
 
 
 == Changelog ==

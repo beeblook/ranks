@@ -4,7 +4,7 @@
 <h2 style="margin-bottom: 20px;"><?php echo $title; ?></h2>
 
 <p>
-	<a href="<?php echo $this->url('index'); ?>">←戻る</a>
+	<a href="<?php echo $this->url('index'); ?>">←<?php _e('back');?></a>
 </p>
 
 <h3><?php echo $accounts['analytics']['label']; ?> 設定変更</h3>
