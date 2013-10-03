@@ -35,6 +35,9 @@ The customized WordPress contents can also be totaled.
 
 
 == Changelog ==
+= 1.0.2 =
+* multilingualization(english & japanase)
+
 = 1.0.1 =
 * fix fail facebook batch request
 
