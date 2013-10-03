@@ -71,7 +71,7 @@
 			<th><strong><?php _e('Auth Code ','ranks');?></strong></th>
 			<td>
 				<input type="text" name="code" size="70" />
-				<a class="button" href="javascript:void(0);" onclick="window.open('<?php echo $google_auth_url; ?>', 'activate','width=700, height=600, menubar=0, status=0, location=0, toolbar=0');"><?php _e('Acquisition　Auth Code','ranks');?></a>
+				<a class="button" href="javascript:void(0);" onclick="window.open('<?php echo $google_auth_url; ?>', 'activate','width=700, height=600, menubar=0, status=0, location=0, toolbar=0');"><?php _e('Acquisition Auth Code','ranks');?></a>
 			</td>
 		</tr>
 	</table>

@@ -40,7 +40,7 @@ class RanksSettingController extends RanksController {
 				foreach ($pattern['log'] as $i => $log) {
 					$method = $log['method'];
 					$timestamp = $log['timestamp'];
-					$label = $pattern['label'].' 集計実行';
+					$label = $pattern['label'].' '.__('Total execution','ranks');
 					$time = $log['processing_time'];
 					$logs[] = compact('method', 'timestamp', 'key', 'label', 'time');
 					$sort['log'][] = $timestamp;
@@ -52,7 +52,7 @@ class RanksSettingController extends RanksController {
 				foreach ($account['log'] as $i => $log) {
 					$method = $log['method'];
 					$timestamp = $log['timestamp'];
-					$label = $account['label'].' データ更新';
+					$label = $account['label'].' '.__('Update data','ranks');
 					$time = $log['processing_time'];
 					$logs[] = compact('method', 'timestamp', 'slug', 'label', 'time');
 					$sort['log'][] = $timestamp;
@@ -105,7 +105,7 @@ class RanksSettingController extends RanksController {
 			}
 
 			$pattern = array(
-				'label' => __('Unset','ranks'),
+				'label' => __('Name unset','ranks'),
 				'post_type' => array('post'),
 				'term' => array('month'=>1),
 				'rates' => array_combine(array_keys($accounts), array_fill(0, count(array_keys($accounts)), 0)),

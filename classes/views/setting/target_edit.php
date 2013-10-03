@@ -7,32 +7,58 @@
 	<a href="<?php echo $this->url('index'); ?>">←戻る</a>
 </p>
 
-<h3>集計パターン 設定変更</h3>
+<h3><?php _e('Pattern','ranks');?> <?php _e('Setting','ranks');?></h3>
 
 <form action="" method="post">
 
 	<?php if ($message) echo $message; ?>
 
-	<div class="ranks-form-block">
-		<input class="ranks-title-input" type="text" name="label" placeholder="名称" value="<?php echo esc_attr($pattern['label']); ?>" /><br>
-		<span class="description">ランキングは <code>query_posts('<?php echo "{$ranks->query_var}={$key}"; ?>');</code> または <code>get_posts('<?php echo "{$ranks->query_var}={$key}"; ?>');</code> で取得可能です。</span>
-	</div>
-
-	<table class="form-table ranks-form-table">
+  <table class="form-table ranks-form-table">
 		<tr>
 			<th>
-				<strong>ランキングキー</strong><br>
-				任意の名称
+				<strong><?php _e('Ranking Key','ranks');?></strong><br>
+				<?php _e('Please set up arbitrary names.','ranks');?>
 			</th>
 			<td>
-				<input class="regular-text" type="text" name="key" placeholder="キー" value="<?php echo $key; ?>" readonly="readonly" /><br>
-				<span class="description">キーは変更できません。</span>
+				<input class="regular-text" type="text" name="label" placeholder="<?php _e('Name','ranks');?>" value="<?php echo esc_attr($pattern['label']); ?>" /><br>
+				<input class="regular-text" type="text" name="key" placeholder="<?php _e('Key','ranks');?>" value="<?php echo $key; ?>" readonly="readonly" />
+				<span class="description"><?php _e('Please input the key by a half-width alphanumeric character.','ranks');?></span><br>
+				<span class="description"><?php _e('Ranking is','ranks');?> <code>query_posts('<?php echo "{$ranks->query_var}=[".__('Key','ranks')."]"; ?>');</code><?php _e('becomes acquirable.','ranks');?></span>
 			</td>
 		</tr>
 		<tr>
 			<th>
-				<strong>レート</strong><br>
-				各データソースのレートの設定
+				<strong><?php _e('PostType','ranks');?></strong><br>
+				<?php _e('Please choose the PostType included in ranking.','ranks');?>
+			</th>
+			<td>
+<?php foreach (get_post_types(array('public'=>true)) as $post_type) : $post_type_object = get_post_type_object($post_type); ?>
+				<label><input type="checkbox" name="post_type[]" value="<?php echo esc_attr($post_type); ?>" <?php checked(in_array($post_type, $pattern['post_type'])); ?> />
+				<?php echo $post_type_object->label; ?>
+				<span class="description">(<?php echo $post_type_object->name; ?>)</span>
+				</label><br>
+<?php endforeach; ?>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				<strong><?php _e('Total period','ranks');?></strong><br>
+				<?php _e('Please set up the period which totals.','ranks');?>
+			</th>
+			<td>
+				<input type="text" name="term[n]" value="<?php echo esc_attr(array_shift(array_values($pattern['term']))); ?>" size="2" />
+				<select name="term[unit]">
+<?php foreach ($terms as $term => $term_format) : ?>
+					<option value="<?php echo esc_attr($term); ?>" <?php selected(isset($pattern['term'][$term])); ?> /> <?php echo sprintf($term_format, ''); ?></option>
+<?php endforeach; ?>
+				</select><br>
+				<span class="description"><?php _e('The contribution of a period set up from today is applicable.','ranks');?></span>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				<strong><?php _e('Rate','ranks');?></strong><br>
+				<?php _e('Please set up the rate of each datasource.','ranks');?>
 			</th>
 			<td>
 <?php foreach ($accounts as $account_slug => $account) : if (!$account['status']) continue; ?>
@@ -45,59 +71,17 @@
 		</tr>
 		<tr>
 			<th>
-				<strong>投稿タイプ</strong><br>
-				ランキングに含める投稿タイプ
+				<strong><?php _e('Automatic total','ranks');?></strong><br>
+				<?php _e('The interval of an automatic total','ranks');?>
 			</th>
 			<td>
-<?php foreach (get_post_types(array('public'=>true)) as $post_type) : $post_type_object = get_post_type_object($post_type); ?>
-				<label><input type="checkbox" name="post_type[]" value="<?php echo esc_attr($post_type); ?>" <?php checked(in_array($post_type, $pattern['post_type'])); ?> />
-				<?php echo $post_type_object->label; ?>
-				<span class="description">(<?php echo $post_type_object->name; ?>)</span>
-				</label><br>
-<?php endforeach; ?>
-			</td>
-		</tr>
-<?php /*
-		<tr>
-			<th>
-				<strong>表示件数</strong><br>
-				表示する投稿の件数
-			</th>
-			<td>
-				<label><input type="text" name="posts_per_page" value="<?php echo esc_attr($pattern['posts_per_page']); ?>" size="2" />
-				位まで表示</label><br>
-				<span class="description">同位の投稿が複数ある場合、最後の順位まで表示されない場合があります。</span>
-			</td>
-		</tr>
-*/ ?>
-		<tr>
-			<th>
-				<strong>集計期間</strong><br>
-				ランキングに含める期間
-			</th>
-			<td>
-				<input type="text" name="term[n]" value="<?php echo esc_attr(array_shift(array_values($pattern['term']))); ?>" size="2" />
-				<select name="term[unit]">
-<?php foreach ($terms as $term => $term_format) : ?>
-					<option value="<?php echo esc_attr($term); ?>" <?php selected(isset($pattern['term'][$term])); ?> /> <?php echo sprintf($term_format, ''); ?></option>
-<?php endforeach; ?>
-				</select><br>
-				<span class="description">本日から設定した期間の投稿が対象になります。</span>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<strong>自動集計</strong><br>
-				自動集計の間隔
-			</th>
-			<td>
-				<label><input data-toggle="ranks-schedule-event" type="checkbox" name="enable_schedule_event" value="enable" <?php checked(!empty($pattern['schedule_event'])); ?> /> 自動集計を有効にする</label><br>
+				<label><input data-toggle="ranks-schedule-event" type="checkbox" name="enable_schedule_event" value="enable" <?php checked(!empty($pattern['schedule_event'])); ?> /> <?php _e('An automatic total is validated.','ranks');?></label><br>
 				<div id="ranks-schedule-event" class="ranks-toggle">
 					<div class="ranks-schedule-type">
-						<label><input type="radio" name="schedule_event[type]" value="daily" <?php checked('daily', $pattern['schedule_event']['type']); ?> /> 毎日</label>
+						<label><input type="radio" name="schedule_event[type]" value="daily" <?php checked('daily', $pattern['schedule_event']['type']); ?> /> <?php _e('daily','ranks');?></label>
 					</div>
 					<div class="ranks-schedule-type">
-						<label><input data-toggle="ranks-schedule-weekly" type="radio" name="schedule_event[type]" value="weekly" <?php checked('weekly', $pattern['schedule_event']['type']); ?> /> 毎週</label>
+						<label><input data-toggle="ranks-schedule-weekly" type="radio" name="schedule_event[type]" value="weekly" <?php checked('weekly', $pattern['schedule_event']['type']); ?> /> <?php _e('weekly','ranks');?></label>
 						<span id="ranks-schedule-weekly" class="ranks-toggle">
 							<select name="schedule_event[week]">
 <?php for ($i = 0; $i <= 6; $i++) : ?>
@@ -107,14 +91,13 @@
 						</span>
 					</div>
 					<div class="ranks-schedule-type">
-						<label><input data-toggle="ranks-schedule-monthly" type="radio" name="schedule_event[type]" value="monthly" <?php checked('monthly', $pattern['schedule_event']['type']); ?> /> 毎月</label>
+						<label><input data-toggle="ranks-schedule-monthly" type="radio" name="schedule_event[type]" value="monthly" <?php checked('monthly', $pattern['schedule_event']['type']); ?> /> <?php _e('monthly','ranks');?></label>
 						<span id="ranks-schedule-monthly" class="ranks-toggle">
 							<select name="schedule_event[day]">
 <?php for ($i = 1; $i <= 31; $i++) : ?>
 								<option value="<?php echo esc_attr($i); ?>" <?php selected($i, $pattern['schedule_event']['day']); ?>><?php echo esc_html($i) ?></option>
 <?php endfor; ?>
 							</select>
-							日
 						</span>
 					</div>
 					<select name="schedule_event[hour]">
@@ -122,44 +105,44 @@
 						<option value="<?php echo esc_attr($i); ?>" <?php selected($i, $pattern['schedule_event']['hour']); ?>><?php echo esc_html($i) ?></option>
 <?php endfor; ?>
 					</select>
-					時に実行<br>
-					<span class="description">WordPress CRON API により定期実行します。</span>
+					<?php _e('Performs','ranks');?><br>
+					<span class="description"><?php _e('Fixed execution is carried out by WordPress CRON API.','ranks');?></span>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<th>
-				<strong>ランキングページ</strong><br>
-				専用ページの生成
+				<strong><?php _e('Ranking page','ranks');?></strong><br>
+				<?php _e('Ranking Page generation','ranks');?>
 			</th>
 			<td>
-				<label><input data-toggle="ranks-rewrite-rule" type="checkbox" name="create_rewrite_rule" value="create" <?php checked(!empty($pattern['rewrite_rule'])); ?> /> ランキングページを生成する</label><br>
+				<label><input data-toggle="ranks-rewrite-rule" type="checkbox" name="create_rewrite_rule" value="create" <?php checked(!empty($pattern['rewrite_rule'])); ?> /> <?php _e('Generate page','ranks');?></label><br>
 				<div id="ranks-rewrite-rule" class="ranks-toggle">
 					<label class="ranks-rewrite-rule-path"><?php echo home_url('/'); ?><input class="regular-text" type="text" name="rewrite_rule" value="<?php echo esc_attr($pattern['rewrite_rule']); ?>" size="10" /></label><br>
-					<span class="description">ランキングページは固定ページより優先して表示されます。</span><br>
-					<span class="description">テンプレートファイルは<code>ranks-(キー).php</code>、<code>ranks.php</code>、<code>archive.php</code>、<code>index.php</code>が使用されます。</span>
+					<span class="description"><?php _e('Priority is given to a ranking page over a fixed page, and it is displayed.','ranks');?></span><br>
+					<span class="description"><?php _e('As for a template file, <code>ranks-(key).php</code><code>ranks.php</code><code>archive.php</code><code>index.php</code> is used.','ranks');?></span>
 				</div>
 			</td>
 		</tr>
 	</table>
 
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="設定を変更" />
-		<input class="ranks-remove-button" type="submit" name="clear" value="設定を削除" />
+		<input class="button-primary" type="submit" name="submit" value="<?php _e('Save','ranks');?>" />
+		<input class="ranks-remove-button" type="submit" name="clear" value="<?php _e('Remove Settings','ranks');?>" />
 	</p>
 
 </form>
 
 
-<h4>集計履歴</h4>
+<h4><?php _e('Total history','ranks');?></h4>
 
 <table class="ranks-posts-table">
 	<thead>
 		<tr>
-			<th>種別</th>
-			<th>日時</th>
-			<th>処理時間</th>
-			<th>処理結果</th>
+			<th><?php _e('Classification','ranks');?></th>
+			<th><?php _e('Time','ranks');?></th>
+			<th><?php _e('Processing time','ranks');?></th>
+			<!--th><?php _e('Processing result','ranks');?></th-->
 		</tr>
 	</thead>
 	<tbody>
@@ -168,15 +151,15 @@
 			<td>予定</td>
 			<td><?php echo date_i18n('Y-m-d H:i:s', $pattern['next_schedule']); ?></td>
 			<td>-</td>
-			<td>-</td>
+			<!--td>-</td-->
 		</tr>
 <?php endif; ?>
 <?php if (!empty($pattern['log'])) : foreach ($pattern['log'] as $i => $log) : ?>
 		<tr>
-			<td><?php echo $log['method'] == 'manual' ? '手動' : '自動'; ?></td>
+			<td><?php echo $log['method'] == 'manual' ? __('Manual','ranks') : __('Automatic','ranks'); ?></td>
 			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp']); ?></td>
 			<td><?php echo number_format_i18n($log['processing_time'], 3) . 'ms'; ?></td>
-			<td><a href="javascript:void(0);<?php //echo $this->url('target_preview', array('key'=>$key, 'log'=>$i)); ?>">確認</a></td>
+			<!--td><a href="<?php echo $this->url('target_preview', array('key'=>$key, 'log'=>$i)); ?>"><?php _e('View','ranks');?></a></td-->
 		</tr>
 <?php endforeach; endif; ?>
 	</tbody>

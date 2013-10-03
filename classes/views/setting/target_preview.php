@@ -7,7 +7,7 @@
 	<a href="<?php echo $this->url('index'); ?>">←<?php _e('back','ranks');?></a>
 </p>
 
-<h3><?php _e('集計パターン ランキング確認','ranks');?></h3>
+<h3><?php _e('Pattern','ranks');?> <?php _e('Ranking check','ranks');?></h3>
 
 <?php if (have_posts()) : ?>
 <table class="ranks-posts-table">
@@ -54,7 +54,7 @@ while(have_posts()):
 </table>
 <?php else : ?>
 
-<p>対象の投稿が見つかりません</p>
+<p><?php _e('The target contribution is not found.','ranks');?></p>
 
 <?php endif; ?>
 

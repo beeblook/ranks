@@ -62,7 +62,7 @@
 									echo __('monthly','ranks') .  $pattern['schedule_event']['day'];
 									break;
 							}
-							echo ' ' . $pattern['schedule_event']['hour'] . __('performs','ranks');
+							echo ' ' . $pattern['schedule_event']['hour'] . __('Performs','ranks');
 							// echo ' <span class="description">(次回予定: ' . date_i18n(__('m/d/Y G','ranks'), $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
 						?></dd>
 <?php endif; ?>
@@ -78,7 +78,7 @@
 				<div class="ranks-action">
 					<a href="<?php echo $this->url('target_score', array('key'=>$pattern_key)); ?>" class="ranks-action-button"><?php _e('Total execution','ranks');?></a>
 					<a href="<?php echo $this->url('target_preview', array('key'=>$pattern_key)); ?>" class="ranks-action-button"><?php _e('Ranking check','ranks');?></a>
-					<a href="<?php echo $this->url('target_edit', array('key'=>$pattern_key)); ?>" class="ranks-action-button ranks-action-right"><?php _e('setting','ranks');?></a>
+					<a href="<?php echo $this->url('target_edit', array('key'=>$pattern_key)); ?>" class="ranks-action-button ranks-action-right"><?php _e('Setting','ranks');?></a>
 				</div>
 			</div>
 <?php endforeach; ?>
@@ -122,7 +122,7 @@
 					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled"><?php _e('Update data','ranks');?></a>
 					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled"><?php _e('View data','ranks');?></a>
 <?php endif; ?>
-					<a href="<?php echo $this->url("account_{$account_slug}") ?>" class="ranks-action-button ranks-action-right"><?php _e('Setting change ','ranks');?></a>
+					<a href="<?php echo $this->url("account_{$account_slug}") ?>" class="ranks-action-button ranks-action-right"><?php _e('Setting','ranks');?></a>
 				</div>
 			</div>
 <?php endforeach; ?>
@@ -151,19 +151,19 @@
 			<td><?php echo date_i18n('Y-m-d H:i:s', $log['timestamp'] + ( get_option( 'gmt_offset' ) * 3600 )); ?></td>
 			<td><?php echo $log['pattern_label']; ?></td>
 			<td><?php echo join(', ', $log['account_label']); ?></td>
-			<td><?php
+			<td>ああああ<?php
 				$time = $log['timestamp'] - $now;
 				if ($time < 0) {
-					echo __('処理中','ranks');
+					echo __('Processing','ranks');
 				} elseif ($time < 60) {
-					echo number_format_i18n($time) . __('秒','ranks');
+					echo number_format_i18n($time) . __('sec','ranks');
 				} elseif ($time < 3600) {
-					echo number_format_i18n(floor($time/60)) . __('分','ranks');
-					echo number_format_i18n($time%60) . __('秒','ranks');
+					echo number_format_i18n(floor($time/60)) . __('minute','ranks');
+					echo number_format_i18n($time%60) . __('sec','ranks');
 				} elseif ($time < 86400) {
-					echo number_format_i18n(ceil($time/3600)) . __('時間','ranks');
+					echo number_format_i18n(ceil($time/3600)) . __('hour','ranks');
 				} else {
-					echo number_format_i18n(ceil($time/86400)) . __('日','ranks');;
+					echo number_format_i18n(ceil($time/86400)) . __('day','ranks');;
 				}
 			?></td>
 		</tr>
@@ -196,15 +196,15 @@
 			<td><?php echo $log['label']; ?></td>
 			<td class="microtime"><?php
 				if ($log['time'] < 10) {
-					echo number_format_i18n($log['time'], 1) . __('秒','ranks');
+					echo number_format_i18n($log['time'], 1) . __('sec','ranks');
 				} elseif ($log['time'] < 60) {
-					echo number_format_i18n($log['time']) . __('秒','ranks');
+					echo number_format_i18n($log['time']) . __('sec','ranks');
 				} else {
-					echo number_format_i18n(floor($log['time']/60)) . __('分','ranks');
-					echo number_format_i18n($log['time']%60) . __('秒','ranks');
+					echo number_format_i18n(floor($log['time']/60)) . __('minute','ranks');
+					echo number_format_i18n($log['time']%60) . __('sec','ranks');
 				}
 			?></td>
-			<td><?php echo $log['method'] == 'manual' ? __('手動','ranks') : __('自動','ranks'); ?></td>
+			<td><?php echo $log['method'] == 'manual' ? __('Manual','ranks') : __('Automatic','ranks'); ?></td>
 		</tr>
 <?php endforeach; endif; ?>
 	</tbody>
