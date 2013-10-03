@@ -4,10 +4,10 @@
 <h2 style="margin-bottom: 20px;"><?php echo $title; ?></h2>
 
 <p>
-	<a href="<?php echo $this->url('index'); ?>">←戻る</a>
+	<a href="<?php echo $this->url('index'); ?>">←<?php _e('back','ranks');?></a>
 </p>
 
-<h3>集計パターン 新規設定登録</h3>
+<h3><?php _e('Pattern','ranks');?> <?php _e('Registration','ranks');?></h3>
 
 <form action="" method="post">
 
@@ -16,20 +16,20 @@
 	<table class="form-table ranks-form-table">
 		<tr>
 			<th>
-				<strong>ランキング</strong><br>
-				任意の名称を設定してください。
+				<strong><?php _e('Ranking','ranks');?></strong><br>
+				<?php _e('Please set up arbitrary names.','ranks');?>
 			</th>
 			<td>
-				<input class="regular-text" type="text" name="label" placeholder="名称" value="<?php echo esc_attr($pattern['label']); ?>" /><br>
-				<input class="regular-text" type="text" name="key" placeholder="キー" value="<?php echo $key; ?>" />
-				<span class="description">キーは半角英数字で入力してください。</span><br>
-				<span class="description">ランキングは <code>query_posts('<?php echo "{$ranks->query_var}=[キー]"; ?>');</code> で取得可能になります。</span>
+				<input class="regular-text" type="text" name="label" placeholder="<?php _e('Name','ranks');?>" value="<?php echo esc_attr($pattern['label']); ?>" /><br>
+				<input class="regular-text" type="text" name="key" placeholder="<?php _e('Key','ranks');?>" value="<?php echo $key; ?>" />
+				<span class="description"><?php _e('Please input the key by a half-width alphanumeric character.','ranks');?></span><br>
+				<span class="description"><?php _e('Ranking is','ranks');?> <code>query_posts('<?php echo "{$ranks->query_var}=[".__('Key','ranks')."]"; ?>');</code><?php _e('becomes acquirable.','ranks');?></span>
 			</td>
 		</tr>
 		<tr>
 			<th>
-				<strong>投稿タイプ</strong><br>
-				ランキングに含める投稿タイプを選択してください。
+				<strong><?php _e('PostType','ranks');?></strong><br>
+        <?php _e('Please choose the PostType included in ranking.','ranks');?>
 			</th>
 			<td>
 <?php foreach (get_post_types(array('public'=>true)) as $post_type) : $post_type_object = get_post_type_object($post_type); ?>
@@ -39,8 +39,8 @@
 		</tr>
 		<tr>
 			<th>
-				<strong>集計期間</strong><br>
-				集計する期間を設定してください。
+				<strong><?php _e('Total period','ranks');?></strong><br>
+        <?php _e('Please set up the period which totals.','ranks');?>
 			</th>
 			<td>
 				<input type="text" name="term[n]" value="<?php echo esc_attr(array_shift(array_values($pattern['term']))); ?>" size="2" />
@@ -49,13 +49,13 @@
 					<option value="<?php echo esc_attr($term); ?>" <?php selected(isset($pattern['term'][$term])); ?> /> <?php echo sprintf($term_format, ''); ?></option>
 <?php endforeach; ?>
 				</select><br>
-				<span class="description">本日から設定した期間の投稿が対象になります。</span>
+				<span class="description"><?php _e('The contribution of a period set up from today is applicable.','ranks');?></span>
 			</td>
 		</tr>
 		<tr>
 			<th>
-				<strong>レート</strong><br>
-				各データソースのレートを設定してください。
+				<strong><?php _e('Rate','ranks');?></strong><br>
+        <?php _e('Please set up the rate of each datasource.','ranks');?>
 			</th>
 			<td>
 <?php foreach ($accounts as $account_slug => $account) : if (!$account['status']) continue; ?>
@@ -68,7 +68,7 @@
 		</tr>
 	</table>
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="設定を登録" />
+		<input class="button-primary" type="submit" name="submit" value="<?php _e('Registration','ranks');?>" />
 	</p>
 
 </form>

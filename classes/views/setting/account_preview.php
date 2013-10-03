@@ -4,23 +4,23 @@
 <h2><?php echo $this->page_title; ?></h2>
 
 <p>
-	<a href="<?php echo $this->url('index'); ?>">←戻る</a>
+	<a href="<?php echo $this->url('index'); ?>">←<?php _e('back','ranks');?></a>
 </p>
 
-<h3><?php echo $accounts[$account_slug]['label']; ?> プレビュー</h3>
+<h3><?php echo $accounts[$account_slug]['label']; ?> <?php _e('Preview','ranks');?></h3>
 
 <table class="form-table ranks-form-table">
 	<tr>
 		<th>
-			<p><strong>データソース プレビュー</strong></p>
-			<p>データソースから集計した値です。</p>
+			<p><strong><?php _e('DataSource','ranks');?> <?php _e('Preview','ranks');?></strong></p>
+			<p><?php _e('the value which totaled from the data source. ','ranks');?></p>
 		</th>
 		<td style="padding: 20px;">
 <?php if (have_posts()) : ?>
 			<table class="ranks-posts-table">
 				<thead>
 					<tr>
-						<th colspan="2" style="width: auto;">投稿</th>
+						<th colspan="2" style="width: auto;"><?php _e('Post','ranks');?></th>
 <?php if ($accounts[$account_slug]['status']) : ?>
 						<th class="account <?php echo $account_slug; ?>"><span><?php echo $accounts[$account_slug]['label']; ?></span></th>
 <?php endif; ?>
@@ -56,7 +56,7 @@ while(have_posts()):
 			</table>
 <?php else : ?>
 
-			<p>対象の投稿が見つかりません</p>
+			<p><?php _e('The target contribution is not found.','ranks');?></p>
 
 <?php endif; ?>
 		</td>

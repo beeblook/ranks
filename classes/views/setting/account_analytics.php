@@ -4,10 +4,10 @@
 <h2 style="margin-bottom: 20px;"><?php echo $title; ?></h2>
 
 <p>
-	<a href="<?php echo $this->url('index'); ?>">←<?php _e('back');?></a>
+	<a href="<?php echo $this->url('index'); ?>">←<?php _e('back','ranks');?></a>
 </p>
 
-<h3><?php echo $accounts['analytics']['label']; ?> 設定変更</h3>
+<h3><?php echo $accounts['analytics']['label']; ?> <?php _e('Setting','ranks');?></h3>
 
 <form action="" method="post">
 
@@ -17,36 +17,36 @@
 
 	<table class="form-table ranks-form-table">
 		<tr>
-			<th><strong>ステータス</strong></th>
-			<td><label><input type="checkbox" name="enable" <?php checked($accounts['analytics']['status']); ?> /> 有効</label></td>
+			<th><strong><?php _e('Status','ranks');?></strong></th>
+			<td><label><input type="checkbox" name="enable" <?php checked($accounts['analytics']['status']); ?> /> <?php _e('Enable','ranks');?></label></td>
 		</tr>
 		<tr>
-			<th><strong>プロパティID</strong></th>
+			<th><strong><?php _e('PropertyID','ranks');?></strong></th>
 			<td><span class="ranks-saved-value"><?php echo $profile['property_id']; ?></span></td>
 		</tr>
 		<tr>
-			<th><strong>プロファイル</strong></th>
+			<th><strong><?php _e('Profile','ranks');?></strong></th>
 			<td><span class="ranks-saved-value"><?php echo $profile['profile_name']; ?></span></td>
 		</tr>
 		<tr>
-			<th><strong>プロファイルID</strong></th>
+			<th><strong><?php _e('ProfileID','ranks');?></strong></th>
 			<td><span class="ranks-saved-value"><?php echo $accounts['analytics']['profile_id']; ?></span></td>
 		</tr>
 		<tr>
-			<th><strong>データ取得期間</strong></th>
+			<th><strong><?php _e('Acquisition Period','ranks');?></strong></th>
 			<td>
 				<input type="text" name="term[n]" value="<?php echo esc_attr(array_shift(array_values($accounts['analytics']['term']))); ?>" size="2" />
 				<select name="term[unit]">
 <?php foreach ($terms as $term => $term_format) : ?>
-					<option value="<?php echo esc_attr($term); ?>" <?php selected(isset($accounts['analytics']['term'][$term])); ?> /> <?php echo sprintf($term_format, ''); ?></option>
+					<option value="<?php echo esc_attr($term); ?>" <?php selected(isset($accounts['analytics']['term'][$term])); ?> /> <?php echo sprintf(__($term_format,'ranks'),''); ?></option>
 <?php endforeach; ?>
 				</select>
 			</td>
 		</tr>
 	</table>
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="保存" />
-		<input class="ranks-remove-button" type="submit" name="clear" value="設定を削除" />
+		<input class="button-primary" type="submit" name="submit" value="<?php _e('Save','ranks');?>" />
+		<input class="ranks-remove-button" type="submit" name="clear" value="<?php _e('Remove Settings','ranks');?>" />
 	</p>
 <?php elseif ( !isset($accounts['analytics']['app_id'] ) || !isset($accounts['analytics']['app_secret'] ) ): ?>
 
@@ -61,30 +61,30 @@
 		</tr>
 	</table>
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="保存" />
+		<input class="button-primary" type="submit" name="submit" value="<?php _e('Save','ranks');?>" />
 	</p>
 
 <?php elseif (empty($selection)) : ?>
 
 	<table class="form-table ranks-form-table">
 		<tr>
-			<th><strong>認証コード</strong></th>
+			<th><strong><?php _e('Auth Code ','ranks');?></strong></th>
 			<td>
 				<input type="text" name="code" size="70" />
-				<a class="button" href="javascript:void(0);" onclick="window.open('<?php echo $google_auth_url; ?>', 'activate','width=700, height=600, menubar=0, status=0, location=0, toolbar=0');">認証コードを取得する</a>
+				<a class="button" href="javascript:void(0);" onclick="window.open('<?php echo $google_auth_url; ?>', 'activate','width=700, height=600, menubar=0, status=0, location=0, toolbar=0');"><?php _e('Acquisition　Auth Code','ranks');?></a>
 			</td>
 		</tr>
 	</table>
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="認証コードを送信" />
-		<input class="ranks-remove-button" type="submit" name="clear" value="設定を削除" />
+		<input class="button-primary" type="submit" name="submit" value="<?php _e('Transmission','ranks');?>" />
+		<input class="ranks-remove-button" type="submit" name="clear" value="<?php _e('Deletion','ranks');?>" />
 	</p>
 
 <?php else : ?>
 
 	<table class="form-table ranks-form-table">
 		<tr>
-			<th><strong>プロファイル</strong></th>
+			<th><strong><?php _e('Profile','ranks');?></strong></th>
 			<td>
 <?php foreach ($selection as $profile_id => $profile) : ?>
 				<div>
@@ -100,8 +100,8 @@
 		</tr>
 	</table>
 	<p class="submit">
-		<input class="button-primary" type="submit" name="submit" value="プロファイルを保存" />
-		<input class="ranks-remove-button" type="submit" name="clear" value="設定を削除" />
+		<input class="button-primary" type="submit" name="submit" value="<?php _e('Save','ranks');?>" />
+		<input class="ranks-remove-button" type="submit" name="clear" value="<?php _e('Remove Settings','ranks');?>" />
 	</p>
 
 <?php endif; ?>

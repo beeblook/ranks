@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Ranks\n"
-"POT-Creation-Date: 2013-09-27 15:10+0900\n"
+"POT-Creation-Date: 2013-10-03 17:44+0900\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: colorchips\n"
@@ -15,37 +15,421 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ..\n"
 
+#: ../classes/controllers/setting.php:103
+#: ../classes/controllers/setting.php:165
+#: ../classes/controllers/setting.php:310
+#: ../classes/controllers/setting.php:418
+msgid "completion of a setting was carried out."
+msgstr "設定完了しました。"
+
+#: ../classes/controllers/setting.php:104
+msgid "The key is already set up."
+msgstr "そのキーはすでに設定されています。"
+
+#: ../classes/controllers/setting.php:108
+msgid "Unset"
+msgstr "未設定"
+
+#: ../classes/controllers/setting.php:308
+msgid "attestation code is not right."
+msgstr "認証コードが正しくありません。"
+
+#: ../classes/controllers/setting.php:309
+msgid "choose the profile which can acquire PV of this site."
+msgstr "本サイトのPVを取得できるプロファイルを選択して下さい。"
+
+#: ../classes/controllers/setting.php:311
+msgid "Setting was deleted."
+msgstr "設定を削除しました。"
+
+#: ../classes/controllers/setting.php:312
+msgid "Google API Client ID and Client Secret are indispensable."
+msgstr "Google API Client ID と Client Secretは必須です。"
+
+#: ../classes/controllers/setting.php:313
+msgid "Google API Client setup was saved."
+msgstr "Google API Client設定を保存しました。"
+
 #: ../classes/views/setting/account_analytics.php:7
+#: ../classes/views/setting/account_facebook.php:7
+#: ../classes/views/setting/account_preview.php:7
+#: ../classes/views/setting/account_twitter.php:7
+#: ../classes/views/setting/target_new.php:7
+#: ../classes/views/setting/target_preview.php:7
 msgid "back"
 msgstr "戻る"
 
-#: ../classes/views/setting/index.php:9
-msgid "pattern"
-msgstr "集計パターン"
+#: ../classes/views/setting/account_analytics.php:10
+#: ../classes/views/setting/account_facebook.php:10
+#: ../classes/views/setting/account_twitter.php:10
+msgid "Setting"
+msgstr "設定変更"
 
-#: ../classes/views/setting/index.php:54
-msgid "daily"
-msgstr "毎日"
+#: ../classes/views/setting/account_analytics.php:20
+#: ../classes/views/setting/account_facebook.php:18
+#: ../classes/views/setting/account_twitter.php:18
+#: ../classes/views/setting/index.php:99
+msgid "Status"
+msgstr "ステータス"
 
-#: ../classes/views/setting/index.php:57
-msgid "weekly"
-msgstr "毎週"
+#: ../classes/views/setting/account_analytics.php:21
+#: ../classes/views/setting/account_facebook.php:19
+#: ../classes/views/setting/account_twitter.php:19
+msgid "Enable"
+msgstr "有効"
 
-#: ../classes/views/setting/index.php:60
-msgid "monthly"
-msgstr "毎月"
+#: ../classes/views/setting/account_analytics.php:24
+msgid "PropertyID"
+msgstr "プロパティID"
 
-#: ../classes/views/setting/index.php:83
-msgid "Add Pattern"
-msgstr "集計パターン追加"
+#: ../classes/views/setting/account_analytics.php:28
+#: ../classes/views/setting/account_analytics.php:87
+msgid "Profile"
+msgstr "プロファイル"
 
-#: ../classes/views/setting/index.php:88
+#: ../classes/views/setting/account_analytics.php:32
+msgid "ProfileID"
+msgstr "プロファイルID"
+
+#: ../classes/views/setting/account_analytics.php:36
+msgid "Acquisition Period"
+msgstr "データ取得期間"
+
+#: ../classes/views/setting/account_analytics.php:48
+#: ../classes/views/setting/account_analytics.php:64
+#: ../classes/views/setting/account_analytics.php:103
+#: ../classes/views/setting/account_facebook.php:31
+#: ../classes/views/setting/account_twitter.php:23
+msgid "Save"
+msgstr "保存"
+
+#: ../classes/views/setting/account_analytics.php:49
+#: ../classes/views/setting/account_analytics.php:104
+msgid "Remove Settings"
+msgstr "設定を削除"
+
+#: ../classes/views/setting/account_analytics.php:71
+msgid "Auth Code "
+msgstr "認証コード"
+
+#: ../classes/views/setting/account_analytics.php:74
+msgid "Acquisition　Auth Code"
+msgstr "認証コードを取得する"
+
+#: ../classes/views/setting/account_analytics.php:79
+msgid "Transmission"
+msgstr "送信する"
+
+#: ../classes/views/setting/account_analytics.php:80
+msgid "Deletion"
+msgstr "削除する"
+
+#: ../classes/views/setting/account_preview.php:10
+#: ../classes/views/setting/account_preview.php:15
+msgid "Preview"
+msgstr "プレビュー"
+
+#: ../classes/views/setting/account_preview.php:15
+#: ../classes/views/setting/index.php:90
 msgid "DataSource"
 msgstr "データソース"
 
-#: ../classes/views/setting/index.php:97
-msgid "status"
-msgstr "ステータス"
+#: ../classes/views/setting/account_preview.php:16
+msgid "the value which totaled from the data source. "
+msgstr "データソースから集計した値です。"
+
+#: ../classes/views/setting/account_preview.php:23
+#: ../classes/views/setting/target_preview.php:16
+msgid "Post"
+msgstr "投稿"
+
+#: ../classes/views/setting/account_preview.php:59
+msgid "The target contribution is not found."
+msgstr "対象の投稿が見つかりません。"
+
+#: ../classes/views/setting/index.php:4
+msgid "Ranks Setting"
+msgstr "Ranks 設定"
+
+#: ../classes/views/setting/index.php:9 ../classes/views/setting/index.php:143
+#: ../classes/views/setting/target_new.php:10
+msgid "Pattern"
+msgstr "集計パターン"
+
+#: ../classes/views/setting/index.php:10
+msgid "A setup of the conditions included in ranking"
+msgstr "ランキングに含める条件の設定"
+
+#: ../classes/views/setting/index.php:39
+#: ../classes/views/setting/target_new.php:42
+msgid "Total period"
+msgstr "集計期間"
+
+#: ../classes/views/setting/index.php:45
+msgid "year"
+msgstr "日"
+
+#: ../classes/views/setting/index.php:46
+msgid "month"
+msgstr "月"
+
+#: ../classes/views/setting/index.php:47
+msgid "week"
+msgstr "週"
+
+#: ../classes/views/setting/index.php:48
+msgid "day"
+msgstr "日"
+
+#: ../classes/views/setting/index.php:52
+msgid "Automatic total"
+msgstr "自動集計"
+
+#: ../classes/views/setting/index.php:56
+msgid "daily"
+msgstr "毎日"
+
+#: ../classes/views/setting/index.php:59
+msgid "weekly"
+msgstr "毎週"
+
+#: ../classes/views/setting/index.php:62
+msgid "monthly"
+msgstr "毎月"
+
+#: ../classes/views/setting/index.php:65
+msgid "performs"
+msgstr "時に実行"
+
+#: ../classes/views/setting/index.php:70
+msgid "Ranking page"
+msgstr "ランキングページ"
+
+#: ../classes/views/setting/index.php:79
+msgid "Total execution"
+msgstr "集計実行"
+
+#: ../classes/views/setting/index.php:80
+msgid "Ranking check"
+msgstr "ランキング確認"
+
+#: ../classes/views/setting/index.php:81
+msgid "setting"
+msgstr "設定変更"
+
+#: ../classes/views/setting/index.php:85
+msgid "Add Pattern"
+msgstr "集計パターン追加"
+
+#: ../classes/views/setting/index.php:91
+msgid "Setting social data"
+msgstr "使用するソーシャルデータの設定"
+
+#: ../classes/views/setting/index.php:100
+msgid "enable"
+msgstr "有効"
+
+#: ../classes/views/setting/index.php:100
+msgid "disable"
+msgstr "無効"
+
+#: ../classes/views/setting/index.php:102
+msgid "profile"
+msgstr "プロファイル"
+
+#: ../classes/views/setting/index.php:108
+msgid "acquisition period"
+msgstr "データ取得期間"
+
+#: ../classes/views/setting/index.php:112
+msgid "n/j/Y"
+msgstr "Y年n月j日"
+
+#: ../classes/views/setting/index.php:112
+msgid " - "
+msgstr " から "
+
+#: ../classes/views/setting/index.php:119
+#: ../classes/views/setting/index.php:122
+msgid "Update data"
+msgstr "データ更新"
+
+#: ../classes/views/setting/index.php:120
+#: ../classes/views/setting/index.php:123
+msgid "View data"
+msgstr "データ確認"
+
+#: ../classes/views/setting/index.php:125
+msgid "Setting change "
+msgstr "設定変更"
+
+#: ../classes/views/setting/index.php:133
+msgid "Total schedule "
+msgstr "集計スケジュール"
+
+#: ../classes/views/setting/index.php:134
+msgid "Automatic Total Planned"
+msgstr "予定されている自動集計"
+
+#: ../classes/views/setting/index.php:135
+msgid "Server Time"
+msgstr "サーバーの時刻"
+
+#: ../classes/views/setting/index.php:142
+#: ../classes/views/setting/index.php:186
+msgid "Time"
+msgstr "日時"
+
+#: ../classes/views/setting/index.php:144
+msgid "Use DataSource"
+msgstr "使用データソース"
+
+#: ../classes/views/setting/index.php:145
+msgid "Remainder"
+msgstr "残り"
+
+#: ../classes/views/setting/index.php:157
+msgid "処理中"
+msgstr ""
+
+#: ../classes/views/setting/index.php:159
+#: ../classes/views/setting/index.php:162
+#: ../classes/views/setting/index.php:199
+#: ../classes/views/setting/index.php:201
+#: ../classes/views/setting/index.php:204
+msgid "秒"
+msgstr ""
+
+#: ../classes/views/setting/index.php:161
+#: ../classes/views/setting/index.php:203
+msgid "分"
+msgstr ""
+
+#: ../classes/views/setting/index.php:164
+msgid "時間"
+msgstr ""
+
+#: ../classes/views/setting/index.php:166
+msgid "日"
+msgstr ""
+
+#: ../classes/views/setting/index.php:178
+msgid "Total history"
+msgstr "集計履歴"
+
+#: ../classes/views/setting/index.php:179
+msgid "Performed total history"
+msgstr "実行された集計履歴"
+
+#: ../classes/views/setting/index.php:187
+msgid "Job"
+msgstr "ジョブ"
+
+#: ../classes/views/setting/index.php:188
+msgid "Processing time"
+msgstr "処理時間"
+
+#: ../classes/views/setting/index.php:189
+msgid "Classification"
+msgstr "種別"
+
+#: ../classes/views/setting/index.php:207
+msgid "手動"
+msgstr ""
+
+#: ../classes/views/setting/index.php:207
+msgid "自動"
+msgstr ""
+
+#: ../classes/views/setting/target_new.php:10
+#: ../classes/views/setting/target_new.php:71
+msgid "Registration"
+msgstr "新規登録"
+
+#: ../classes/views/setting/target_new.php:19
+msgid "Ranking"
+msgstr "ランキング"
+
+#: ../classes/views/setting/target_new.php:20
+msgid "Please set up arbitrary names."
+msgstr "任意の名称を設定してください。"
+
+#: ../classes/views/setting/target_new.php:23
+msgid "Name"
+msgstr "名称"
+
+#: ../classes/views/setting/target_new.php:24
+#: ../classes/views/setting/target_new.php:26
+msgid "Key"
+msgstr "キー"
+
+#: ../classes/views/setting/target_new.php:25
+msgid "Please input the key by a half-width alphanumeric character."
+msgstr "キーは半角英数字で入力してください。"
+
+#: ../classes/views/setting/target_new.php:26
+msgid "Ranking is"
+msgstr "ランキングは"
+
+#: ../classes/views/setting/target_new.php:26
+msgid "becomes acquirable."
+msgstr "で取得可能になります。"
+
+#: ../classes/views/setting/target_new.php:31
+msgid "PostType"
+msgstr "投稿タイプ"
+
+#: ../classes/views/setting/target_new.php:32
+msgid "Please choose the PostType included in ranking."
+msgstr "ランキングに含める投稿タイプを選択してください。"
+
+#: ../classes/views/setting/target_new.php:43
+msgid "Please set up the period which totals."
+msgstr "集計する期間を設定してください。"
+
+#: ../classes/views/setting/target_new.php:52
+msgid "The contribution of a period set up from today is applicable."
+msgstr "本日から設定した期間の投稿が対象になります。"
+
+#: ../classes/views/setting/target_new.php:57
+msgid "Rate"
+msgstr "レート"
+
+#: ../classes/views/setting/target_new.php:58
+msgid "Please set up the rate of each datasource."
+msgstr "各データソースのレートを設定してください。"
+
+#: ../classes/views/setting/target_preview.php:10
+msgid "集計パターン ランキング確認"
+msgstr ""
+
+#: ../classes/views/setting/target_preview.php:40
+msgid "m/d/Y"
+msgstr "Y年n月j日"
+
+#~ msgid "For %s year"
+#~ msgstr "%s年間"
+
+#~ msgid "For %s month"
+#~ msgstr "%sヶ月"
+
+#~ msgid "For %s week"
+#~ msgstr "%s週間"
+
+#~ msgid "For %s day"
+#~ msgstr "%s日間"
+
+#~ msgid "認証コード "
+#~ msgstr "キーは半角英数字で入力してください。"
+
+#~ msgid "completion of a setting"
+#~ msgstr "設定完了しました。"
+
+#~ msgid "save"
+#~ msgstr "保存"
+
+#~ msgid "集計スケジュール"
+#~ msgstr "page_title"
 
 #~ msgid "Make Ranking From Google Analytics/Facebook/Twitter"
 #~ msgstr "Analytics/Facebook/Twitterからランキングを作ることが出来ます。"

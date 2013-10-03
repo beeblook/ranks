@@ -4,15 +4,15 @@ require_once RANKS_DIR . '/libraries/gapi.class.php';
 
 class RanksSettingController extends RanksController {
 
-	public $page_title = 'Ranks 設定';
+	public $page_title = 'Ranks Setting';
 	public $menu_title = 'Ranks';
 	public $capability = 'edit_posts';
 
 	public $terms = array(
-		'year' => '%s年間',
-		'month' => '%sヶ月',
-		'week' => '%s週間',
-		'day' => '%s日間',
+		'year' => 'year',
+		'month' => 'month',
+		'week' => 'week',
+		'day' => 'day',
 	);
 
 	public function index() {
@@ -24,7 +24,7 @@ class RanksSettingController extends RanksController {
 
 		$sort = array('schedule'=>array(), 'log'=>array());
 		$schedule = $logs = array();
-		
+
 		foreach ($patterns as $key => $pattern) {
 			if ($next_schedule = wp_next_scheduled("ranks_schedule_{$key}", Array( $key ))) {
 				$timestamp = $next_schedule;
@@ -88,7 +88,7 @@ class RanksSettingController extends RanksController {
 				$patterns[$key]['post_type'] = $_POST['post_type'];
 				$patterns[$key]['term'] = array($_POST['term']['unit']=>$_POST['term']['n']);
 				$patterns[$key]['rates'] = array_map('floatval', $_POST['rates']);
-				
+
 				$this->ranks->set_patterns( $patterns );
 				$message = 1;
 
@@ -100,12 +100,12 @@ class RanksSettingController extends RanksController {
 		} else {
 
 			switch ($_GET['message']) {
-				case 1: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
-				case 1: $message = '<div class="ranks-error">そのキーはすでに設定されています。</div>'; break;
+				case 1: $message = '<div class="ranks-message">'.__('completion of a setting was carried out.','ranks').'</div>'; break;
+				case 1: $message = '<div class="ranks-error">'.__('The key is already set up.','ranks').'</div>'; break;
 			}
 
 			$pattern = array(
-				'label' => '名称未設定',
+				'label' => __('Unset','ranks'),
 				'post_type' => array('post'),
 				'term' => array('month'=>1),
 				'rates' => array_combine(array_keys($accounts), array_fill(0, count(array_keys($accounts)), 0)),
@@ -162,7 +162,7 @@ class RanksSettingController extends RanksController {
 		} else {
 
 			switch ($_GET['message']) {
-				case 1: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
+				case 1: $message = '<div class="ranks-message">'.__('completion of a setting was carried out.','ranks').'</div>'; break;
 			}
 
 			$pattern = $patterns[$key];
@@ -305,16 +305,16 @@ class RanksSettingController extends RanksController {
 		} else {
 
 			switch ($_GET['message']) {
-				case 1: $message = '<div class="ranks-error">認証コードが正しくありません。</div>'; break;
-				case 2: $message = '<div class="ranks-message">本サイトのPVを取得できるプロファイルを選択して下さい。</div>'; break;
-				case 3: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
-				case 9: $message = '<div class="ranks-message">設定を削除しました。</div>'; break;
-				case 10: $message = '<div class="ranks-error">Google API Client ID と Client Secretは必須です。</div>'; break;
-				case 11: $message = '<div class="ranks-message">Google API Client設定を保存しました。</div>'; break;
+				case 1: $message = '<div class="ranks-error">'.__('attestation code is not right.','ranks').'</div>'; break;
+				case 2: $message = '<div class="ranks-message">'.__('choose the profile which can acquire PV of this site.','ranks').'</div>'; break;
+				case 3: $message = '<div class="ranks-message">'.__('completion of a setting was carried out.','ranks').'</div>'; break;
+				case 9: $message = '<div class="ranks-message">'.__('Setting was deleted.','ranks').'</div>'; break;
+				case 10: $message = '<div class="ranks-error">'.__('Google API Client ID and Client Secret are indispensable.','ranks').'</div>'; break;
+        case 11: $message = '<div class="ranks-message">'.__('Google API Client setup was saved.','ranks').'</div>'; break;
 			}
 
 			if ( !isset($accounts['analytics']['app_id'] ) || !isset($accounts['analytics']['app_secret'] ) ) {
-				
+
 			}
 			else if (isset($accounts['analytics']['token'])) {
 
@@ -381,7 +381,7 @@ class RanksSettingController extends RanksController {
 			$accounts['facebook']['status']		= isset($_POST['enable']) && $_POST['enable'];
 			$accounts['facebook']['app_id']		= urlencode( $_POST['app_id'] );
 			$accounts['facebook']['app_secret']	= urlencode( $_POST['app_secret'] );
-			
+
 			update_option('ranks_accounts', $accounts);
 			$message = 1;
 
@@ -415,7 +415,7 @@ class RanksSettingController extends RanksController {
 		} else {
 
 			switch ($_GET['message']) {
-				case 1: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
+				case 1: $message = '<div class="ranks-message">'.__('completion of a setting was carried out.','ranks').'</div>'; break;
 			}
 
 		}

@@ -1,13 +1,13 @@
 <div class="wrap">
 
 <div class="icon32" id="icon-options-general"><br></div>
-<h2 style="margin-bottom: 10px;"><?php echo $title; ?></h2>
+<h2 style="margin-bottom: 10px;"><?php _e('Ranks Setting', 'ranks'); ?></h2>
 
 <table class="form-table ranks-form-table">
 	<tr>
 		<th>
-			<p><strong><?php _e('pattern','ranks');?></strong></p>
-			<p>ランキングに含める条件の設定</p>
+			<p><strong><?php _e('Pattern','ranks');?></strong></p>
+			<p><?php _e('A setup of the conditions included in ranking','ranks');?></p>
 		</th>
 		<td>
 <?php foreach ($patterns as $pattern_key => $pattern) : ?>
@@ -36,18 +36,20 @@
 						?>
 					</div>
 					<dl class="ranks-datalist">
-<?php /*
-						<dt><span>表示件数</span></dt>
-						<dd><?php echo number_format_i18n($pattern['posts_per_page']); ?>位まで表示</dd>
-*/ ?>
-						<dt><span>集計期間</span></dt>
+						<dt><span><?php _e('Total period','ranks');?></span></dt>
 						<dd><?php
 							$unit = array_shift(array_keys($pattern['term']));
 							$n = $pattern['term'][$unit];
-							echo sprintf($terms[$unit], $n);// . '<br><span class="description">(' . date('Y年n月j日', strtotime("$n $unit ago")) . ' から ' . date('Y年n月j日') . ')</span>';
-						?></dd>
+							echo sprintf(__($terms[$unit],'ranks'), $n);
+              //it's dumy
+              __('year','ranks');
+              __('month','ranks');
+              __('week','ranks');
+              __('day','ranks');
+              ?>
+            </dd>
 <?php if (!empty($pattern['schedule_event'])) : ?>
-						<dt><span>自動集計</span></dt>
+						<dt><span><?php _e('Automatic total','ranks');?></span></dt>
 						<dd><?php
 							switch ($pattern['schedule_event']['type']) {
 								case 'daily':
@@ -57,15 +59,15 @@
 									echo __('weekly','ranks') . $wp_locale->get_weekday($pattern['schedule_event']['week']);
 									break;
 								case 'monthly':
-									echo __('monthly','ranks') .  $pattern['schedule_event']['day'] . '日';
+									echo __('monthly','ranks') .  $pattern['schedule_event']['day'];
 									break;
 							}
-							echo ' ' . $pattern['schedule_event']['hour'] . '時に実行';
-							// echo ' <span class="description">(次回予定: ' . date_i18n('Y年n月j日 G時', $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
+							echo ' ' . $pattern['schedule_event']['hour'] . __('performs','ranks');
+							// echo ' <span class="description">(次回予定: ' . date_i18n(__('m/d/Y G','ranks'), $pattern['next_schedule'] + (get_option('gmt_offset') * 3600)) . ')</span>';
 						?></dd>
 <?php endif; ?>
 <?php if (!empty($pattern['rewrite_rule'])) : ?>
-						<dt><span>ランキングページ</span></dt>
+						<dt><span><?php _e('Ranking page','ranks');?></span></dt>
 						<dd><?php
 							$url = home_url($pattern['rewrite_rule']);
 							echo '<a href="' . $url . '" target="_blank">' . $url . '</a>';
@@ -74,9 +76,9 @@
 					</dl>
 				</div>
 				<div class="ranks-action">
-					<a href="<?php echo $this->url('target_score', array('key'=>$pattern_key)); ?>" class="ranks-action-button">集計実行</a>
-					<a href="<?php echo $this->url('target_preview', array('key'=>$pattern_key)); ?>" class="ranks-action-button">ランキング確認</a>
-					<a href="<?php echo $this->url('target_edit', array('key'=>$pattern_key)); ?>" class="ranks-action-button ranks-action-right">設定変更</a>
+					<a href="<?php echo $this->url('target_score', array('key'=>$pattern_key)); ?>" class="ranks-action-button"><?php _e('Total execution','ranks');?></a>
+					<a href="<?php echo $this->url('target_preview', array('key'=>$pattern_key)); ?>" class="ranks-action-button"><?php _e('Ranking check','ranks');?></a>
+					<a href="<?php echo $this->url('target_edit', array('key'=>$pattern_key)); ?>" class="ranks-action-button ranks-action-right"><?php _e('setting','ranks');?></a>
 				</div>
 			</div>
 <?php endforeach; ?>
@@ -86,7 +88,7 @@
 	<tr>
 		<th>
 			<p><strong><?php _e('DataSource','ranks');?></strong></p>
-			<p>使用するソーシャルデータの設定</p>
+			<p><?php _e('Setting social data','ranks');?></p>
 		</th>
 		<td>
 <?php foreach ($accounts as $account_slug => $account) : ?>
@@ -94,33 +96,33 @@
 				<div class="ranks-box-label"><?php echo $account['label']; ?></div>
 				<div class="ranks-box-columns">
 					<dl class="ranks-datalist">
-						<dt><span><?php _e('status','ranks');?></span></dt>
-						<dd><?php echo $account['status'] ? '有効' : '無効'; ?></dd>
+						<dt><span><?php _e('Status','ranks');?></span></dt>
+						<dd><?php echo $account['status'] ? __('enable','ranks') : __('disable','ranks'); ?></dd>
 <?php if (isset($account['profile_id'])) : ?>
-						<dt><span>プロファイル</span></dt>
+						<dt><span><?php _e('profile','ranks');?></span></dt>
 						<dd>
 							<?php echo $account['profile_id'] ? 'ga:'.$account['profile_id'] : ''; ?>
 						</dd>
 <?php endif; ?>
 <?php if (isset($account['term'])) : ?>
-						<dt><span>データ取得期間</span></dt>
+						<dt><span><?php _e('acquisition period','ranks');?></span></dt>
 						<dd><?php
 							$unit = array_shift(array_keys($account['term']));
 							$n = $account['term'][$unit];
-							echo sprintf($terms[$unit], $n) . ' <span class="description">(' . date('Y年n月j日', strtotime("$n $unit ago")) . ' から ' . date('Y年n月j日') . ')</span>';
+							echo sprintf($terms[$unit], $n) . ' <span class="description">(' . date(__('n/j/Y','ranks'), strtotime("$n $unit ago")) . __(' - ','ranks') . date(__('n/j/Y','ranks')) . ')</span>';
 						?></dd>
 <?php endif; ?>
 					</dl>
 				</div>
 				<div class="ranks-action">
 <?php if ($account['status']) : ?>
-					<a href="<?php echo $this->url('account_count', array('account'=>$account_slug)); ?>" class="ranks-action-button">データ更新</a>
-					<a href="<?php echo $this->url('account_preview', array('account'=>$account_slug)); ?>" class="ranks-action-button">データ確認</a>
+					<a href="<?php echo $this->url('account_count', array('account'=>$account_slug)); ?>" class="ranks-action-button"><?php _e('Update data','ranks');?></a>
+					<a href="<?php echo $this->url('account_preview', array('account'=>$account_slug)); ?>" class="ranks-action-button"><?php _e('View data','ranks');?></a>
 <?php else : ?>
-					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled">データ更新</a>
-					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled">データ確認</a>
+					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled"><?php _e('Update data','ranks');?></a>
+					<a href="javascript:void(0);" class="ranks-action-button ranks-action-disabled"><?php _e('View data','ranks');?></a>
 <?php endif; ?>
-					<a href="<?php echo $this->url("account_{$account_slug}") ?>" class="ranks-action-button ranks-action-right">設定変更</a>
+					<a href="<?php echo $this->url("account_{$account_slug}") ?>" class="ranks-action-button ranks-action-right"><?php _e('Setting change ','ranks');?></a>
 				</div>
 			</div>
 <?php endforeach; ?>
@@ -128,19 +130,19 @@
 	</tr>
 	<tr>
 		<th>
-			<p><strong>集計スケジュール</strong></p>
-			<p>予定されている自動集計</p>
-			<p>サーバーの時刻:<br><?php echo date_i18n('Y-m-d H:i:s'); ?></p>
+			<p><strong><?php _e('Total schedule ','ranks');?></strong></p>
+			<p><?php _e('Automatic Total Planned','ranks');?></p>
+			<p><?php _e('Server Time','ranks');?>:<br><?php echo date_i18n('Y-m-d H:i:s'); ?></p>
 		</th>
 		<td>
 
 <table class="ranks-schedule-table">
 	<thead>
 		<tr>
-			<th>日時</th>
-			<th>集計パターン</th>
-			<th>使用データソース</th>
-			<th>残り</th>
+			<th><?php _e('Time','ranks');?></th>
+			<th><?php _e('Pattern','ranks');?></th>
+			<th><?php _e('Use DataSource','ranks');?></th>
+			<th><?php _e('Remainder','ranks');?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -152,16 +154,16 @@
 			<td><?php
 				$time = $log['timestamp'] - $now;
 				if ($time < 0) {
-					echo '処理中';
+					echo __('処理中','ranks');
 				} elseif ($time < 60) {
-					echo number_format_i18n($time) . '秒';
+					echo number_format_i18n($time) . __('秒','ranks');
 				} elseif ($time < 3600) {
-					echo number_format_i18n(floor($time/60)) . '分';
-					echo number_format_i18n($time%60) . '秒';
+					echo number_format_i18n(floor($time/60)) . __('分','ranks');
+					echo number_format_i18n($time%60) . __('秒','ranks');
 				} elseif ($time < 86400) {
-					echo number_format_i18n(ceil($time/3600)) . '時間';
+					echo number_format_i18n(ceil($time/3600)) . __('時間','ranks');
 				} else {
-					echo number_format_i18n(ceil($time/86400)) . '日';
+					echo number_format_i18n(ceil($time/86400)) . __('日','ranks');;
 				}
 			?></td>
 		</tr>
@@ -173,18 +175,18 @@
 	</tr>
 	<tr>
 		<th>
-			<p><strong>集計履歴</strong></p>
-			<p>実行された集計履歴</p>
+			<p><strong><?php _e('Total history','ranks');?></strong></p>
+			<p><?php _e('Performed total history','ranks');?></p>
 		</th>
 		<td>
 
 <table class="ranks-schedule-table">
 	<thead>
 		<tr>
-			<th>日時</th>
-			<th>ジョブ</th>
-			<th>処理時間</th>
-			<th>種別</th>
+			<th><?php _e('Time','ranks');?></th>
+			<th><?php _e('Job','ranks');?></th>
+			<th><?php _e('Processing time','ranks');?></th>
+			<th><?php _e('Classification','ranks');?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -194,15 +196,15 @@
 			<td><?php echo $log['label']; ?></td>
 			<td class="microtime"><?php
 				if ($log['time'] < 10) {
-					echo number_format_i18n($log['time'], 1) . '秒';
+					echo number_format_i18n($log['time'], 1) . __('秒','ranks');
 				} elseif ($log['time'] < 60) {
-					echo number_format_i18n($log['time']) . '秒';
+					echo number_format_i18n($log['time']) . __('秒','ranks');
 				} else {
-					echo number_format_i18n(floor($log['time']/60)) . '分';
-					echo number_format_i18n($log['time']%60) . '秒';
+					echo number_format_i18n(floor($log['time']/60)) . __('分','ranks');
+					echo number_format_i18n($log['time']%60) . __('秒','ranks');
 				}
 			?></td>
-			<td><?php echo $log['method'] == 'manual' ? '手動' : '自動'; ?></td>
+			<td><?php echo $log['method'] == 'manual' ? __('手動','ranks') : __('自動','ranks'); ?></td>
 		</tr>
 <?php endforeach; endif; ?>
 	</tbody>
