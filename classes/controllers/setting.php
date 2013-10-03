@@ -391,7 +391,7 @@ class RanksSettingController extends RanksController {
 		} else {
 
 			switch ($_GET['message']) {
-				case 1: $message = '<div class="ranks-message">設定完了しました。</div>'; break;
+				case 1: $message = '<div class="ranks-message">'.__('completion of a setting was carried out.','ranks').'</div>'; break;
 			}
 
 		}
