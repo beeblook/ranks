@@ -5,13 +5,14 @@ Plugin URI: http://www.colorchips.co.jp/
 Description: Make Ranking From Google Analytics/Facebook/Twitter
 Author: COLORCHIPS
 Author URI: http://www.colorchips.co.jp/
-Version: 1.0.2
+Version: 1.0.3
 Text Domain: ranks
 Domain Path: /languages
 */
 
-define('RANKS_VER', '1.0.2');
+define('RANKS_VER', '1.0.3');
 define('RANKS_DIR', dirname(__FILE__));
+define('RANKS_URL', plugin_dir_url( __FILE__ ));
 define('RANKS_LOG', false);
 
 $ranks = new Ranks();
@@ -80,6 +81,7 @@ class Ranks {
 	public function __construct() {
 		require_once RANKS_DIR . '/core/controller.php';
 		require_once RANKS_DIR . '/core/view.php';
+    include_once RANKS_DIR . '/widget.php';
 
     load_textdomain($this->textdomain, plugin_dir_path(__FILE__) . $this->lang_dir . '/' . $this->textdomain . '-' . get_locale() . '.mo');
 

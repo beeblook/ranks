@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Ranks\n"
-"POT-Creation-Date: 2013-10-03 20:05+0900\n"
+"POT-Creation-Date: 2013-11-13 19:04+0900\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: colorchips\n"
@@ -14,6 +14,30 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;:\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ..\n"
+
+#: ../widget.php:10
+msgid "Ranks Widget"
+msgstr "Ranks ウィジェット"
+
+#: ../widget.php:11
+msgid "Display The Your Registerd Rank "
+msgstr "ランキングを表示します。"
+
+#: ../widget.php:67 ../classes/views/setting/target_new.php:19
+msgid "Ranking"
+msgstr "ランキング"
+
+#: ../widget.php:78
+msgid "Title"
+msgstr "ウィジェットタイトル"
+
+#: ../widget.php:83 ../classes/views/setting/index.php:9
+#: ../classes/views/setting/index.php:143
+#: ../classes/views/setting/target_edit.php:10
+#: ../classes/views/setting/target_new.php:10
+#: ../classes/views/setting/target_preview.php:10
+msgid "Pattern"
+msgstr "集計パターン"
 
 #: ../classes/controllers/setting.php:43 ../classes/views/setting/index.php:79
 msgid "Total execution"
@@ -28,6 +52,7 @@ msgstr "データ更新"
 #: ../classes/controllers/setting.php:103
 #: ../classes/controllers/setting.php:165
 #: ../classes/controllers/setting.php:310
+#: ../classes/controllers/setting.php:394
 #: ../classes/controllers/setting.php:418
 msgid "completion of a setting was carried out."
 msgstr "設定完了しました。"
@@ -96,7 +121,7 @@ msgid "PropertyID"
 msgstr "プロパティID"
 
 #: ../classes/views/setting/account_analytics.php:28
-#: ../classes/views/setting/account_analytics.php:87
+#: ../classes/views/setting/account_analytics.php:122
 msgid "Profile"
 msgstr "プロファイル"
 
@@ -110,7 +135,7 @@ msgstr "データ取得期間"
 
 #: ../classes/views/setting/account_analytics.php:48
 #: ../classes/views/setting/account_analytics.php:64
-#: ../classes/views/setting/account_analytics.php:103
+#: ../classes/views/setting/account_analytics.php:138
 #: ../classes/views/setting/account_facebook.php:31
 #: ../classes/views/setting/account_twitter.php:23
 #: ../classes/views/setting/target_edit.php:130
@@ -118,26 +143,58 @@ msgid "Save"
 msgstr "保存"
 
 #: ../classes/views/setting/account_analytics.php:49
-#: ../classes/views/setting/account_analytics.php:104
+#: ../classes/views/setting/account_analytics.php:139
 #: ../classes/views/setting/target_edit.php:131
 msgid "Remove Settings"
 msgstr "設定を削除"
 
-#: ../classes/views/setting/account_analytics.php:71
+#: ../classes/views/setting/account_analytics.php:68
+msgid ""
+"1.Go to <a href=\"https://cloud.google.com/console\" target=\"_blank"
+"\">Google Cloud Console</a>."
+msgstr ""
+"1.<a href=\"https://cloud.google.com/console\" target=\"_blank\">Google "
+"Cloud Console</a>へ。"
+
+#: ../classes/views/setting/account_analytics.php:73
+msgid "2. Create a new project."
+msgstr "2. プロジェクトを新規作成します。"
+
+#: ../classes/views/setting/account_analytics.php:78
+msgid "3. Enabling Analytics API."
+msgstr "3.Analytics APIを有効にします。"
+
+#: ../classes/views/setting/account_analytics.php:83
+msgid "4. Register NEW APP."
+msgstr "4. アプリケーションを新規登録します。"
+
+#: ../classes/views/setting/account_analytics.php:88
+msgid "5. Set CLIENT ID And CLIENT SECRET "
+msgstr "5. CLIENT ID と CLIENT SECRET をRANKSに設定します。"
+
+#: ../classes/views/setting/account_analytics.php:97
 msgid "Auth Code "
 msgstr "認証コード"
 
-#: ../classes/views/setting/account_analytics.php:74
+#: ../classes/views/setting/account_analytics.php:100
 msgid "Acquisition Auth Code"
 msgstr "認証コードを取得する"
 
-#: ../classes/views/setting/account_analytics.php:79
+#: ../classes/views/setting/account_analytics.php:105
 msgid "Transmission"
 msgstr "送信する"
 
-#: ../classes/views/setting/account_analytics.php:80
+#: ../classes/views/setting/account_analytics.php:106
 msgid "Deletion"
 msgstr "削除する"
+
+#: ../classes/views/setting/account_analytics.php:110
+msgid "6. Permission to Access NEW App"
+msgstr "6. 認証コードを取得します。"
+
+#: ../classes/views/setting/account_analytics.php:115
+msgid "7. Input AuthCode."
+msgstr "7. 認証コードを登録します。"
 
 #: ../classes/views/setting/account_preview.php:10
 #: ../classes/views/setting/account_preview.php:15
@@ -166,13 +223,6 @@ msgstr "対象の投稿が見つかりません。"
 #: ../classes/views/setting/index.php:4
 msgid "Ranks Setting"
 msgstr "Ranks 設定"
-
-#: ../classes/views/setting/index.php:9 ../classes/views/setting/index.php:143
-#: ../classes/views/setting/target_edit.php:10
-#: ../classes/views/setting/target_new.php:10
-#: ../classes/views/setting/target_preview.php:10
-msgid "Pattern"
-msgstr "集計パターン"
 
 #: ../classes/views/setting/index.php:10
 msgid "A setup of the conditions included in ranking"
@@ -464,10 +514,6 @@ msgstr "確認"
 #: ../classes/views/setting/target_new.php:71
 msgid "Registration"
 msgstr "新規登録"
-
-#: ../classes/views/setting/target_new.php:19
-msgid "Ranking"
-msgstr "ランキング"
 
 #: ../classes/views/setting/target_preview.php:40
 msgid "m/d/Y"
