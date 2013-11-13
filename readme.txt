@@ -3,6 +3,7 @@ Contributors: COLORCHIPS
 Tags: ranking, post, analytics, facebook, twitter
 Requires at least: 3.5.0
 Tested up to: 3.6.0
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +34,13 @@ A setup at 0:00 to 23:00 is possible.
 It corresponds also to a custom poste type.
 The customized WordPress contents can also be totaled.
 
+== Screenshots ==
+
+1. RANKS Global Setting.
+
+2. Registration The Your Ranking Pattern.
+
+3. View Data.
 
 == Changelog ==
 = 1.0.2 =
