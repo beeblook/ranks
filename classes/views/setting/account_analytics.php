@@ -64,6 +64,32 @@
 		<input class="button-primary" type="submit" name="submit" value="<?php _e('Save','ranks');?>" />
 	</p>
 
+  <p>
+    <h2><?php _e('1.Go to <a href="https://cloud.google.com/console" target="_blank">Google Cloud Console</a>.','ranks');?></h2>
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-1.png" >
+  </p>
+
+  <p>
+    <h2><?php _e('2. Create a new project.','ranks');?></h2>
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-2.png" >
+  </p>
+
+  <p>
+    <h2><?php _e('3. Enabling Analytics API.','ranks');?></h2>
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-3.png" >
+  </p>
+
+  <p>
+    <h2><?php _e('4. Register NEW APP.','ranks');?></h2>
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-4.png" >
+  </p>
+
+  <p>
+    <h2><?php _e('5. Set CLIENT ID And CLIENT SECRET ','ranks');?></h2>
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-5-1.png" >
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-5-2.png" >
+  </p>
+
 <?php elseif (empty($selection)) : ?>
 
 	<table class="form-table ranks-form-table">
@@ -80,6 +106,15 @@
 		<input class="ranks-remove-button" type="submit" name="clear" value="<?php _e('Deletion','ranks');?>" />
 	</p>
 
+  <p>
+    <h2><?php _e('6. Permission to Access NEW App','ranks');?></h2>
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-6-1.png" >
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-6-2.png" >
+  </p>
+  <p>
+    <h2><?php _e('7. Input AuthCode.','ranks');?></h2>
+    <img src="<?php echo RANKS_URL;?>images/setting-analytics-7.png" >
+  </p>
 <?php else : ?>
 
 	<table class="form-table ranks-form-table">
