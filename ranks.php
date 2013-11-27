@@ -2,7 +2,7 @@
 /**
 Plugin Name: Ranks
 Plugin URI: http://www.colorchips.co.jp/
-Description: Make Ranking From Google Analytics/Facebook/Twitter
+Description: This plugin add up popular posts from Google Analytics, Facebook and Twitter
 Author: COLORCHIPS
 Author URI: http://www.colorchips.co.jp/
 Version: 1.0.3

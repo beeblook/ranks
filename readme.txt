@@ -1,6 +1,6 @@
 === Ranks ===
 Contributors: COLORCHIPS
-Tags: ranking, post, analytics, facebook, twitter
+Tags: popular, popular posts, google, analytics, facebook, twitter, widget, custom post type, posts
 Requires at least: 3.5.0
 Tested up to: 3.6.0
 Stable tag: 1.0.3
@@ -43,6 +43,9 @@ The customized WordPress contents can also be totaled.
 3. View Data.
 
 == Changelog ==
+= 1.0.3 =
+* add widget
+
 = 1.0.2 =
 * multilingualization(english & japanase)
 
