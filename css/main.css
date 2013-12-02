@@ -1,0 +1,42 @@
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+
+body {
+    padding-bottom: 20px;
+}
+
+.jumbotron .btn-default {
+    background-color: transparent;
+}
+
+.btn-link {
+    color: #333;
+}
+
+.btn-download,
+.btn-changelog {
+    width: 130px;
+}
+
+.btn-star {
+    color: #cccc33;
+}
+.btn-star:hover {
+    color: #dddd44;
+}
+.btn-star i {
+    letter-spacing: 3px;
+}
+
+a.colorchips {
+    color: #333;
+    font-size: 24px;
+}
+a.colorchips:hover {
+    text-decoration: none;
+}
+
