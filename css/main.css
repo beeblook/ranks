@@ -13,15 +13,15 @@ body {
     background-color: transparent;
 }
 
+@media (max-width: 768px) {
+    .jumbotron {
+        text-align: center;
+    }
+}
+
 .btn-link {
     color: #333;
 }
-
-.btn-download,
-.btn-changelog {
-    width: 130px;
-}
-
 .btn-star {
     color: #cccc33;
 }
@@ -30,6 +30,19 @@ body {
 }
 .btn-star i {
     letter-spacing: 3px;
+}
+
+#screenshots .col-lg-4 {
+    margin: 10px auto;
+}
+
+@media (min-width: 1200px) {
+    #screenshots .col-lg-4 {
+        margin: auto;
+    }
+    #screenshots .thumbnail {
+        height: 430px;
+    }
 }
 
 a.colorchips {
