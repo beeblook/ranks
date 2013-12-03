@@ -9,12 +9,20 @@ body {
     padding-bottom: 20px;
 }
 
+.jumbotron {
+    background-color: #ddeeed;
+    background-image: url(../img/bg.png);
+    background-position: right top;
+    background-repeat: no-repeat;
+}
+
 .jumbotron .btn-default {
     background-color: transparent;
 }
 
 @media (max-width: 768px) {
     .jumbotron {
+        background-position: center top;
         text-align: center;
     }
 }
@@ -41,8 +49,18 @@ body {
         margin: auto;
     }
     #screenshots .thumbnail {
-        height: 430px;
+        height: 230px;
+        overflow: hidden;
     }
+}
+
+.dot3 {
+    letter-spacing: 2px;
+    line-height: 24px;
+}
+
+.company {
+    line-height: 24px;
 }
 
 a.colorchips {
@@ -52,4 +70,5 @@ a.colorchips {
 a.colorchips:hover {
     text-decoration: none;
 }
+
 

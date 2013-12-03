@@ -13,6 +13,8 @@
 
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+        <link rel="stylesheet" href="js/vendor/nivo-lightbox/nivo-lightbox.css" type="text/css" />
+        <link rel="stylesheet" href="js/vendor/nivo-lightbox/themes/default/default.css" type="text/css" />
         <link rel="stylesheet" href="css/main.css">
 
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
@@ -38,19 +40,19 @@
 
     <div class="container">
 
-      <div id="pickup" class="row">
+      <div id="description" class="row">
         <div class="col-lg-4">
-          <h2>Analytics data<br><small>アナリティクスのデータ</small></h2>
+          <h2>Google Analytics</h2>
           <p>Get the page view from Google Analytics, and ranking Popular Posts.</p>
           <p>Google アナリティクスからページビューを取得して、人気の投稿をランキングします。</p>
         </div>
         <div class="col-lg-4">
-          <h2>Automatic ranking<br><small>自動ランキング集計</small></h2>
+          <h2>Automatic ranking</h2>
           <p>Popular Posts will get the latest. You can be set to the freely interval.</p>
           <p>人気の投稿は常に最新の結果が得られます。それも好きな間隔で設定できます。</p>
        </div>
         <div class="col-lg-4">
-          <h2>Social media ranking<br><small>ソーシャルランキング</small></h2>
+          <h2>Social media ranking</h2>
           <p>Ranks can ranking post as well as page views, popular social media.</p>
           <p>Ranksはページビューだけでなく、ソーシャルメディアで人気の投稿もランキングできます。</p>
         </div>
@@ -60,31 +62,22 @@
 
       <div id="screenshots" class="row">
         <div class="col-lg-12">
-          <h3>Screenshots<br><small>スクリーンショット</small></h3>
+          <h3>Screenshots</h3>
         </div>
         <div class="col-lg-4">
-          <div class="thumbnail">
+          <a class="thumbnail" href="http://s.wordpress.org/plugins/ranks/screenshot-1.jpg" title="Global Setting." data-lightbox-gallery="screenshots">
             <img src="http://s.wordpress.org/plugins/ranks/screenshot-1.jpg" alt="screenshot-1.jpg">
-            <div class="caption">
-              <small>Global Setting.</small>
-            </div>
-          </div>
+          </a>
         </div>
         <div class="col-lg-4">
-          <div class="thumbnail">
+          <a class="thumbnail" href="http://s.wordpress.org/plugins/ranks/screenshot-2.jpg" title="Registration The Your Ranking Pattern." data-lightbox-gallery="screenshots">
             <img src="http://s.wordpress.org/plugins/ranks/screenshot-2.jpg" alt="screenshot-2.jpg">
-            <div class="caption">
-              <small>Registration The Your Ranking Pattern.</small>
-            </div>
-          </div>
+          </a>
         </div>
         <div class="col-lg-4">
-          <div class="thumbnail">
+          <a class="thumbnail" href="http://s.wordpress.org/plugins/ranks/screenshot-3.jpg" title="View Data." data-lightbox-gallery="screenshots">
             <img src="http://s.wordpress.org/plugins/ranks/screenshot-3.jpg" alt="screenshot-3.jpg">
-            <div class="caption">
-              <small>View Data.</small>
-            </div>
-          </div>
+          </a>
         </div>
       </div>
 
@@ -92,39 +85,63 @@
 
       <div id="feature" class="row">
         <div class="col-lg-3">
-          <h3>Feature<br><small>機能</small></h3>
+          <h3>Feature</h3>
         </div>
         <div class="col-lg-9">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <h4 class="list-group-item-heading">Analytics data <small>アナリティクスのデータ</small></h4>
-              <p class="list-group-item-text">Get the page view from Google Analytics, and ranking Popular Posts.</p>
-              <p class="list-group-item-text">Google アナリティクスからページビューを取得して、人気の投稿をランキングします。</p>
-            </li>
-            <li class="list-group-item">
-              <h4 class="list-group-item-heading">Automatic ranking <small>自動ランキング集計</small></h4>
-              <p class="list-group-item-text">Popular Posts will get the latest. You can be set to the freely interval.</p>
-              <p class="list-group-item-text">人気の投稿は常に最新の結果が得られます。それも好きな間隔で設定できます。</p>
-           </li>
-            <li class="list-group-item">
-              <h4 class="list-group-item-heading">Social media ranking <small>ソーシャルランキング</small></h4>
-              <p class="list-group-item-text">Ranks can ranking post as well as page views, popular social media.</p>
-              <p class="list-group-item-text">Ranksはページビューだけでなく、ソーシャルメディアで人気の投稿もランキングできます。</p>
-            </li>
-            <li class="list-group-item">
-              <span class="badge">1.0.3</span>
-              <h4 class="list-group-item-heading">Ranking Widget <small>ランキングウィジェット</small></h4>
-              <p class="list-group-item-text">Support the widget that outputs a posts list.</p>
-              <p class="list-group-item-text">標準的なリストを出力するウィジェットをサポートしています。</p>
-            </li>
-          </ul>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="pull-right"><span class="label label-info">1.0.1</span></div>
+              <h4 class="panel-title">Analytics data<br><small>アナリティクスのデータ</small></h4>
+            </div>
+            <div class="panel-body">
+              <p>Get the page view from Google Analytics, and ranking Popular Posts.</p>
+              <p>Google アナリティクスからページビューを取得して、人気の投稿をランキングします。</p>
+            </div>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="pull-right"><span class="label label-info">1.0.1</span></div>
+              <h4 class="panel-title">Automatic ranking<br><small>自動ランキング集計</small></h4>
+            </div>
+            <div class="panel-body">
+              <p>Popular Posts will get the latest. You can be set to the freely interval.</p>
+              <p>人気の投稿は常に最新の結果が得られます。それも好きな間隔で設定できます。</p>
+            </div>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="pull-right"><span class="label label-info">1.0.1</span></div>
+              <h4 class="panel-title">Social media ranking<br><small>ソーシャルランキング</small></h4>
+            </div>
+            <div class="panel-body">
+              <p>Ranks can ranking post as well as page views, popular social media.</p>
+              <p>Ranksはページビューだけでなく、ソーシャルメディアで人気の投稿もランキングできます。</p>
+            </div>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="pull-right"><span class="label label-info">1.0.3</span></div>
+              <h4 class="panel-title">Ranking Widget<br><small>ランキングウィジェット</small></h4>
+            </div>
+            <div class="panel-body">
+              <p>Support the widget that outputs a posts list.</p>
+              <p>標準的なリストを出力するウィジェットをサポートしています。</p>
+            </div>
+          </div>
         </div>
       </div>
 
       <hr>
 
       <footer>
-        <p><a class="colorchips" href="http://www.colorchips.co.jp/" target="_blank">COLORCHIPS</a></p>
+        <p class="dot3 pull-right">
+          <i class="fa fa-stop" style="color: #FF3088;"></i>
+          <i class="fa fa-stop" style="color: #199AB2;"></i>
+          <i class="fa fa-stop" style="color: #B5A834;"></i>
+        </p>
+        <p class="company">
+          <a class="colorchips" href="http://www.colorchips.co.jp/" target="_blank">COLORCHIPS</a>
+        </p>
       </footer>
     </div> <!-- /container -->
 
@@ -135,7 +152,9 @@
 
         <script src="js/vendor/bootstrap.min.js"></script>
 
-        <!-- <script src="js/main.js"></script> -->
+        <script src="js/vendor/nivo-lightbox/nivo-lightbox.min.js"></script>
+
+        <script src="js/main.js"></script>
 
         <script>
             var _gaq=[['_setAccount','UA-28970800-4'],['_trackPageview']];
